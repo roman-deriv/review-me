@@ -1,3 +1,4 @@
+import json
 import os
 import openai
 import httpx
@@ -50,7 +51,13 @@ def generate_code_review(files):
 
 def main():
     repo = os.getenv("GITHUB_REPOSITORY")
-    pr_number = os.getenv("GITHUB_REF").split('/')[-1]
+    event_path = os.getenv("GITHUB_EVENT_PATH")
+
+    with open(event_path, 'r') as f:
+        event = json.load(f)
+
+    pr_number = event["issue"]["number"]
+
     github_token = os.getenv("GITHUB_TOKEN")
 
     files = get_pr_files(repo, pr_number, github_token)
