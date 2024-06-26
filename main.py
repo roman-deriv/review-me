@@ -1,35 +1,10 @@
 import json
 import os
+
 import openai
-import httpx
+from github import Github
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
-
-
-def get_pr_files(repo, pr_number, token):
-    headers = {
-        "Authorization": f"token {token}",
-        "Accept": "application/vnd.github.v3+json",
-    }
-    response = httpx.get(
-        f"https://api.github.com/repos/{repo}/pulls/{pr_number}/files", headers=headers
-    )
-    response.raise_for_status()
-    return response.json()
-
-
-def post_pr_comment(repo, pr_number, token, comment):
-    headers = {
-        "Authorization": f"token {token}",
-        "Accept": "application/vnd.github.v3+json",
-    }
-    data = {"body": comment}
-    response = httpx.post(
-        f"https://api.github.com/repos/{repo}/issues/{pr_number}/comments",
-        headers=headers, json=data
-    )
-    response.raise_for_status()
-    return response.json()
 
 
 def generate_code_review(files):
@@ -50,6 +25,7 @@ def generate_code_review(files):
 
 
 def main():
+    github_token = os.getenv("GITHUB_TOKEN")
     repo = os.getenv("GITHUB_REPOSITORY")
     event_path = os.getenv("GITHUB_EVENT_PATH")
 
@@ -58,13 +34,14 @@ def main():
 
     pr_number = event["issue"]["number"]
 
-    github_token = os.getenv("GITHUB_TOKEN")
-
-    files = get_pr_files(repo, pr_number, github_token)
+    gh = Github(github_token)
+    repo = gh.get_repo(repo)
+    pr = repo.get_pull(pr_number)
+    files = pr.get_files()
 
     review_comment = generate_code_review(files)
 
-    post_pr_comment(repo, pr_number, github_token, review_comment)
+    pr.create_issue_comment(review_comment)
 
 
 if __name__ == "__main__":
