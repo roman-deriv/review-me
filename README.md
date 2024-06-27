@@ -28,7 +28,7 @@
 
 ## Run the Project Locally (macOS)
 
-1. **Clone the Repository**:
+- **Clone the Repository**:
    ```shell
    git clone <repository-url>
    cd <repository-directory>
