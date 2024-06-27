@@ -36,9 +36,9 @@ def generate_file_comments(pr, model):
         "changes from the a single file in the PR."
         "You must review the code changes and provide meaningful feedback when "
         "necessary. You are *NOT* reviewing the entire PR, just this single file. "
-        "Keep your comment CONCISE and clear. Only provide feedback if there is "
-        "something CONCRETE and SPECIFIC to say. If it's okay as is, simply reply "
-        "with only 'LGTM.'"
+        "Keep your comment as CONCISE as possible and clear. "
+        "Only provide feedback if there is something CONCRETE and SPECIFIC to say. "
+        "If it's okay as is, simply reply with the exact phrase 'LGTM.'"
     )
 
     file_diffs = get_file_diffs(pr)
@@ -50,7 +50,7 @@ def generate_file_comments(pr, model):
             f"Filename: {filename}\n\n"
             f"Diff:\n{patch}"
         )
-        print(prompt)
+        print(filename)
         print("--------")
         response = openai.chat.completions.create(
             model=model,
@@ -98,7 +98,6 @@ def test():
     repo = os.environ.get("GITHUB_REPOSITORY")
     pr = get_pr(github_token, repo, 2)
     review_comments = generate_file_comments(pr, "gpt-3.5-turbo")
-    print(review_comments)
 
 
 if __name__ == "__main__":
