@@ -15,6 +15,8 @@ def generate_overall_comment():
         "and you must review the code changes in order to "
         "provide feedback as needed."
     )
+    # TODO: Implement
+    pass
 
 
 def generate_file_comments(pr, model):
@@ -29,6 +31,7 @@ def generate_file_comments(pr, model):
         "Only provide feedback if there is something CONCRETE and SPECIFIC to say. "
         "If it's okay as is, simply reply with the exact phrase 'LGTM.'"
     )
+    commit_msgs = [commit.commit.message for commit in pr.get_commits()]
 
     file_comments = {}
     for file in pr.get_files():
@@ -36,6 +39,7 @@ def generate_file_comments(pr, model):
             continue
         prompt = (
             f"PR Title: {pr.title}\n\n"
+            f"PR Commits: - {"\n- ".join(commit_msgs)}\n\n"
             f"PR Body:\n{pr.body}\n\n"
             f"Filename: {file.filename}\n\n"
             f"Diff:\n{file.patch}"
