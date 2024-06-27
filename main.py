@@ -7,17 +7,31 @@ from github import Github
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def generate_code_review(files):
-    prompt = "Review the following code changes and provide feedback:\n"
-    for file in files:
-        prompt += f"\nFile: {file['filename']}\n"
-        prompt += file['patch']
-        prompt += "\n\n"
+def get_file_diffs(files):
+    file_diffs = {}
 
+    for file in files:
+        if file.status != "modified":
+            continue
+        file_diffs[file.filename] = file.patch
+
+    return file_diffs
+
+
+def generate_code_review(file_diffs):
+    system_prompt = (
+        "Your job is to review GitHub Pull Requests. "
+        "You must act as an expert software engineer. "
+        "You will be given a diff of the changes from the PR, "
+        "and you must review the code changes in order to "
+        "provide feedback as needed."
+    )
+    prompt = f"PR Diff:\n{file_diffs}"
     response = openai.chat.completions.create(
         model="gpt-4o",
         messages=[
-            {"role": "user", "content": prompt}
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt},
         ],
         max_tokens=1_000,
     )
@@ -38,8 +52,9 @@ def main():
     repo = gh.get_repo(repo)
     pr = repo.get_pull(pr_number)
     files = pr.get_files()
+    file_diffs = get_file_diffs(files)
 
-    review_comment = generate_code_review(files)
+    review_comment = generate_code_review(file_diffs)
 
     pr.create_issue_comment(review_comment)
 
