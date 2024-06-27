@@ -1,2 +1,2 @@
-openai~=1.35.4
+openai~=1.35.5
 PyGithub~=2.3.0
