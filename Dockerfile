@@ -7,4 +7,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-ENTRYPOINT ["python", "scripts/review_code.py"]
+ENTRYPOINT ["python", "main.py"]
