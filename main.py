@@ -18,7 +18,7 @@ def get_file_diffs(pr):
     return file_diffs
 
 
-def generate_code_review(file_diffs):
+def generate_code_review(file_diffs, model):
     system_prompt = (
         "Your job is to review GitHub Pull Requests. "
         "You must act as an expert software engineer. "
@@ -28,7 +28,7 @@ def generate_code_review(file_diffs):
     )
     prompt = f"PR Diff:\n{file_diffs}"
     response = openai.chat.completions.create(
-        model="gpt-4o",
+        model=model,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt},
@@ -58,7 +58,7 @@ def main():
     pr = get_pr(github_token, repo, pr_number)
     file_diffs = get_file_diffs(pr)
 
-    review_comment = generate_code_review(file_diffs)
+    review_comment = generate_code_review(file_diffs, "gpt-4o")
 
     pr.create_issue_comment(review_comment)
 
@@ -68,7 +68,7 @@ def test():
     repo = os.environ.get("GITHUB_REPOSITORY")
     pr = get_pr(github_token, repo, 1)
     file_diffs = get_file_diffs(pr)
-    review_comment = generate_code_review(file_diffs)
+    review_comment = generate_code_review(file_diffs, "gpt-3.5-turbo")
     print(review_comment)
 
 
