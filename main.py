@@ -7,17 +7,6 @@ from github import Github
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def get_file_diffs(pr):
-    file_diffs = {}
-
-    for file in pr.get_files():
-        if file.status != "modified":
-            continue
-        file_diffs[file.filename] = file.patch
-
-    return file_diffs
-
-
 def generate_overall_comment():
     system_prompt = (
         "Your job is to review GitHub Pull Requests. "
@@ -41,17 +30,16 @@ def generate_file_comments(pr, model):
         "If it's okay as is, simply reply with the exact phrase 'LGTM.'"
     )
 
-    file_diffs = get_file_diffs(pr)
     file_comments = {}
-    for filename, patch in file_diffs.items():
+    for file in pr.get_files():
+        if file.status != "modified":
+            continue
         prompt = (
             f"PR Title: {pr.title}\n\n"
             f"PR Body:\n{pr.body}\n\n"
-            f"Filename: {filename}\n\n"
-            f"Diff:\n{patch}"
+            f"Filename: {file.filename}\n\n"
+            f"Diff:\n{file.patch}"
         )
-        print(filename)
-        print("--------")
         response = openai.chat.completions.create(
             model=model,
             messages=[
@@ -61,10 +49,7 @@ def generate_file_comments(pr, model):
             max_tokens=1_000,
         )
         comment = response.choices[0].message.content.strip()
-        print(comment)
-        print("========")
-        print()
-        file_comments[filename] = comment
+        file_comments[file.filename] = comment
     return file_comments
 
 
@@ -98,6 +83,12 @@ def test():
     repo = os.environ.get("GITHUB_REPOSITORY")
     pr = get_pr(github_token, repo, 2)
     review_comments = generate_file_comments(pr, "gpt-3.5-turbo")
+    for filename, comment in review_comments.items():
+        print(filename)
+        print("--------")
+        print(comment)
+        print("========")
+        print()
 
 
 if __name__ == "__main__":
