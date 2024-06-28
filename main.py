@@ -19,7 +19,7 @@ def generate_overall_comment():
     pass
 
 
-def generate_file_comments(pr, model):
+def generate_file_comments(pr, model, debug=False):
     system_prompt = (
         "Your job is to review a single file diff from a GitHub Pull Request. "
         "You must act as an expert software engineer. "
@@ -44,6 +44,8 @@ def generate_file_comments(pr, model):
             f"Filename: {file.filename}\n\n"
             f"Diff:\n{file.patch}"
         )
+        if debug:
+            continue
         response = openai.chat.completions.create(
             model=model,
             messages=[
@@ -86,7 +88,7 @@ def test():
     github_token = os.environ.get("GITHUB_TOKEN")
     repo = os.environ.get("GITHUB_REPOSITORY")
     pr = get_pr(github_token, repo, 2)
-    review_comments = generate_file_comments(pr, "gpt-3.5-turbo")
+    review_comments = generate_file_comments(pr, "gpt-3.5-turbo", debug=True)
     for filename, comment in review_comments.items():
         print(filename)
         print("--------")
