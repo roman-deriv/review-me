@@ -3,34 +3,13 @@ import os
 
 from github import Github
 
+import ai.prompt
 import ai.service
-
-
-def generate_overall_comment():
-    system_prompt = (
-        "Your job is to review GitHub Pull Requests. "
-        "You must act as an expert software engineer. "
-        "You will be given a diff of the changes from the PR, "
-        "and you must review the code changes in order to "
-        "provide feedback as needed."
-    )
-    # TODO: Implement
-    pass
 
 
 def generate_file_comments(pr, strategy, model, debug=False):
     chat_completion = ai.service.chat_completion(strategy)
-    system_prompt = (
-        "Your job is to review a single file diff from a GitHub Pull Request. "
-        "You must act as an expert software engineer. "
-        "You will be given the PR title and description, as well as a diff of the "
-        "changes from the a single file in the PR."
-        "You must review the code changes and provide meaningful feedback when "
-        "necessary. You are *NOT* reviewing the entire PR, just this single file. "
-        "Keep your comment as CONCISE as possible and clear. "
-        "Only provide feedback if there is something CONCRETE and SPECIFIC to say. "
-        "If it's okay as is, simply reply with the exact phrase 'LGTM.'"
-    )
+    system_prompt = ai.prompt.load("system-prompt-code-file")
     commit_msgs = [commit.commit.message for commit in pr.get_commits()]
 
     file_comments = {}
