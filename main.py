@@ -1,6 +1,7 @@
 import json
 import os
 
+import anthropic
 import openai
 from github import Github
 
@@ -17,6 +18,42 @@ def generate_overall_comment():
     )
     # TODO: Implement
     pass
+
+
+def anthropic_chat_completion(system_prompt, prompt,
+                              model="claude-3-5-sonnet-20240620"):
+    client = anthropic.Anthropic()
+
+    message = client.messages.create(
+        model=model,
+        max_tokens=1000,
+        temperature=0,
+        system=system_prompt,
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": prompt,
+                    }
+                ]
+            }
+        ]
+    )
+    return message.content
+
+
+def openai_chat_completion(system_prompt, prompt, model):
+    response = openai.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt},
+        ],
+        max_tokens=1_000,
+    )
+    return response.choices[0].message.content.strip()
 
 
 def generate_file_comments(pr, model, debug=False):
@@ -46,15 +83,7 @@ def generate_file_comments(pr, model, debug=False):
         )
         if debug:
             continue
-        response = openai.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt},
-            ],
-            max_tokens=1_000,
-        )
-        comment = response.choices[0].message.content.strip()
+        comment = openai_chat_completion(system_prompt, prompt, model)
         file_comments[file.filename] = comment
     return file_comments
 
