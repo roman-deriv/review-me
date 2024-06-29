@@ -1,73 +1,15 @@
 import json
 import os
 
-import anthropic
-import openai
 from github import Github
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+import ai.prompt
+import ai.service
 
 
-def generate_overall_comment():
-    system_prompt = (
-        "Your job is to review GitHub Pull Requests. "
-        "You must act as an expert software engineer. "
-        "You will be given a diff of the changes from the PR, "
-        "and you must review the code changes in order to "
-        "provide feedback as needed."
-    )
-    # TODO: Implement
-    pass
-
-
-def anthropic_chat_completion(system_prompt, prompt,
-                              model="claude-3-5-sonnet-20240620"):
-    client = anthropic.Anthropic()
-
-    message = client.messages.create(
-        model=model,
-        max_tokens=1000,
-        temperature=0,
-        system=system_prompt,
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": prompt,
-                    }
-                ]
-            }
-        ]
-    )
-    return message.content
-
-
-def openai_chat_completion(system_prompt, prompt, model):
-    response = openai.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt},
-        ],
-        max_tokens=1_000,
-    )
-    return response.choices[0].message.content.strip()
-
-
-def generate_file_comments(pr, model, debug=False):
-    system_prompt = (
-        "Your job is to review a single file diff from a GitHub Pull Request. "
-        "You must act as an expert software engineer. "
-        "You will be given the PR title and description, as well as a diff of the "
-        "changes from the a single file in the PR."
-        "You must review the code changes and provide meaningful feedback when "
-        "necessary. You are *NOT* reviewing the entire PR, just this single file. "
-        "Keep your comment as CONCISE as possible and clear. "
-        "Only provide feedback if there is something CONCRETE and SPECIFIC to say. "
-        "If it's okay as is, simply reply with the exact phrase 'LGTM.'"
-    )
+def generate_file_comments(pr, strategy, model, debug=False):
+    chat_completion = ai.service.chat_completion(strategy)
+    system_prompt = ai.prompt.load("system-prompt-code-file")
     commit_msgs = [commit.commit.message for commit in pr.get_commits()]
 
     file_comments = {}
@@ -83,7 +25,7 @@ def generate_file_comments(pr, model, debug=False):
         )
         if debug:
             continue
-        comment = openai_chat_completion(system_prompt, prompt, model)
+        comment = chat_completion(system_prompt, prompt, model)
         file_comments[file.filename] = comment
     return file_comments
 
@@ -96,6 +38,8 @@ def get_pr(github_token, repo, pr_number):
 
 
 def main():
+    strategy = "openai"
+    model = os.environ.get(f"{strategy.upper()}_MODEL")
     github_token = os.environ.get("GITHUB_TOKEN")
     repo = os.environ.get("GITHUB_REPOSITORY")
     event_path = os.environ.get("GITHUB_EVENT_PATH")
@@ -107,17 +51,21 @@ def main():
 
     pr = get_pr(github_token, repo, pr_number)
 
-    review_comments = generate_file_comments(pr, "gpt-4o")
+    review_comments = generate_file_comments(pr, strategy, model)
 
     for comment in review_comments.values():
         pr.create_issue_comment(comment)
 
 
 def test():
+    strategy = "openai"
+    model = os.environ.get(f"{strategy.upper()}_TEST_MODEL")
     github_token = os.environ.get("GITHUB_TOKEN")
     repo = os.environ.get("GITHUB_REPOSITORY")
+
     pr = get_pr(github_token, repo, 2)
-    review_comments = generate_file_comments(pr, "gpt-3.5-turbo", debug=True)
+
+    review_comments = generate_file_comments(pr, strategy, model, debug=True)
     for filename, comment in review_comments.items():
         print(filename)
         print("--------")
