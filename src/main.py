@@ -1,5 +1,5 @@
-from app import config
-from app.app import App
+import config
+from app import App
 
 
 def main():

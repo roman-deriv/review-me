@@ -126,13 +126,3 @@ class App:
         )
         review = self._generate_review(comments)
         self._submit_review(review)
-
-
-def main():
-    cfg = config.from_env()
-    app = App(cfg)
-    app.run()
-
-
-if __name__ == "__main__":
-    main()
