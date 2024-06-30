@@ -1,5 +1,3 @@
-import json
-
 import github
 
 import ai.prompt
@@ -77,13 +75,10 @@ class App:
                 ],
                 tool_override="post_feedback",
             )
-            feedback = results["feedback"]
 
-            comments[filename] = [
-                comment["body"]
-                for comment in feedback
-            ]
+            comments[filename] = results["feedback"]
 
+        # TODO: get overall comment based on aggregate feedback
         overall_comment = ""
 
         return model.Feedback(
@@ -106,9 +101,10 @@ class App:
 
             for comment in comments:
                 self._pr.create_review_comment(
-                    body=comment,
+                    body=comment.pop("body"),
                     commit=commit,
                     path=filename,
+                    **comment,
                 )
 
     def run(self):

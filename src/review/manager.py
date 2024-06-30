@@ -46,6 +46,7 @@ class ReviewManager:
         return self._preamble() + f"Changes:\n{combined_diff}"
 
     def file_diff(self, filename: str) -> str:
+        # TODO: add the entire file with line numbers
         return self._preamble() + (
             f"Diff for file: {filename}\n{self._context.diffs[filename]}"
         )
