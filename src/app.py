@@ -87,25 +87,22 @@ class App:
         )
 
     def _submit_review(self, feedback: model.Feedback):
-        commits = [commit for commit in self._pr.get_commits()]
-        commit = commits[-1]
         for filename, comments in feedback.comments.items():
             print(filename, len(comments))
             print("--------")
             for comment in comments:
+                comment.update(path=filename)
                 print(comment)
             print("========")
             print()
             if self._config.debug:
                 continue
 
-            for comment in comments:
-                self._pr.create_review_comment(
-                    body=comment.pop("body"),
-                    commit=commit,
-                    path=filename,
-                    **comment,
-                )
+            self._pr.create_review(
+                body=feedback.overall_comment,
+                comments=comments,
+                event="COMMENT",
+            )
 
     def run(self):
         feedback = self._generate_feedback()
