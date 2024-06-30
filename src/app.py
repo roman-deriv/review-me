@@ -4,20 +4,28 @@ import github
 
 import ai.prompt
 import ai.service
+import ai.tool
 import config
 import model
 import review.manager
 
 
-def files_to_review(llm_config: config.LlmConfig, overview: str) -> list[str]:
-    chat_completion = ai.service.chat_completion(llm_config.strategy)
+def files_to_review(
+        llm_config: config.LlmConfig,
+        overview: str
+) -> list[dict[str, str]]:
+    tool_completion = ai.service.tool_completion(llm_config.strategy)
     system_prompt = ai.prompt.load("system-prompt-overview")
-    comment = chat_completion(
+    results = tool_completion(
         system_prompt=system_prompt,
         prompt=overview,
         model=llm_config.model,
+        tools=[
+            ai.tool.review_files,
+        ],
+        tool_override="review_files",
     )
-    files = json.loads(comment)
+    files = results["files"]
     return files
 
 
@@ -27,30 +35,6 @@ def review_files(files, debug=False):
         if debug:
             continue
         yield filename
-
-
-def generate_file_comments(
-        llm_config: config.LlmConfig,
-        manager: review.manager.ReviewManager,
-        debug=False,
-):
-    chat_completion = ai.service.chat_completion(llm_config.strategy)
-    overview = manager.overview()
-    files = files_to_review(llm_config, overview)
-
-    comments = {}
-    system_prompt = ai.prompt.load("system-prompt-code-file")
-    for filename in files:
-        prompt = manager.file_diff(filename)
-        if debug:
-            continue
-        comment = chat_completion(
-            system_prompt=system_prompt,
-            prompt=prompt,
-            model=llm_config.model,
-        )
-        comments[filename] = comment
-    return comments
 
 
 def get_pr(cfg: config.GitHubConfig):
@@ -70,10 +54,16 @@ class App:
         manager = review.manager.ReviewManager(context)
         overview = manager.overview()
         files = files_to_review(self._config.llm, overview)
+        print("We should review these files")
+        for file in files:
+            print("Filename:", file["filename"])
+            print("Reason:", file["reason"])
+            print()
 
         comments = {}
         system_prompt = ai.prompt.load("system-prompt-code-file")
-        for filename in files:
+        for file in files:
+            filename = file["filename"]
             if self._config.debug:
                 continue
 
