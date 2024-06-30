@@ -1,112 +1,99 @@
-import dataclasses
+import json
 
 import github
-from github.PullRequest import PullRequest
 
 import ai.prompt
 import ai.service
 import config
+import model
+import review.manager
 
 
-def files_to_review(pr: PullRequest):
-    ctx_builder = ReviewContextBuilder(pull_request=pr)
-    files = []
+def files_to_review(llm_config: config.LlmConfig, overview: str) -> list[str]:
+    chat_completion = ai.service.chat_completion(llm_config.strategy)
+    system_prompt = ai.prompt.load("system-prompt-overview")
+    comment = chat_completion(
+        system_prompt=system_prompt,
+        prompt=overview,
+        model=llm_config.model,
+    )
+    files = json.loads(comment)
+    return files
 
-    return pr.get_files()
 
-
-def generate_file_comments(pr, strategy, model, debug=False):
-    chat_completion = ai.service.chat_completion(strategy)
+def review_files(files, debug=False):
     system_prompt = ai.prompt.load("system-prompt-code-file")
-    commit_msgs = [commit.commit.message for commit in pr.get_commits()]
-
-    file_comments = {}
-    for file in files_to_review(pr):
-        if file.status != "modified":
-            continue
-        prompt = (
-            f"PR Title: {pr.title}\n\n"
-            f"PR Commits: - {"\n- ".join(commit_msgs)}\n\n"
-            f"PR Body:\n{pr.body}\n\n"
-            f"Filename: {file.filename}\n\n"
-            f"Diff:\n{file.patch}"
-        )
+    for filename in files:
         if debug:
             continue
-        comment = chat_completion(system_prompt, prompt, model)
-        file_comments[file.filename] = comment
-    return file_comments
+        yield filename
 
 
-def get_pr(github_token, repo, pr_number):
-    gh = github.Github(github_token)
-    repo = gh.get_repo(repo)
-    pr = repo.get_pull(pr_number)
-    return pr
+def generate_file_comments(
+        llm_config: config.LlmConfig,
+        manager: review.manager.ReviewManager,
+        debug=False,
+):
+    chat_completion = ai.service.chat_completion(llm_config.strategy)
+    overview = manager.overview()
+    files = files_to_review(llm_config, overview)
 
-
-def get_pr_comments(pr: PullRequest):
-    issue_comments = pr.get_issue_comments()
-    review_comments = pr.get_review_comments()
-    return issue_comments, review_comments
-
-
-@dataclasses.dataclass
-class Review:
-    comments: dict[str, str]
-    overall_comment = str
-
-
-class ReviewContextBuilder:
-    def __init__(self, pull_request: PullRequest):
-        self._pr = pull_request
-
-    def _pr_commits(self):
-        return [
-            commit.commit.message
-            for commit in self._pr.get_commits()
-        ]
-
-    def _pr_diff(self):
-        return {
-            file.filename: file.patch
-            for file in self._pr.get_files()
-        }
-
-    def _pr_comments(self) -> list:
-        issue_comments = self._pr.get_issue_comments()
-        review_comments = self._pr.get_review_comments()
-        return [comment for comment in review_comments]
-
-    def build(self) -> str:
-        title = self._pr.title
-        description = self._pr.body
-        commit_messages = self._pr_commits()
-        diff = self._pr_diff()
-
-        return (
-            f"PR Title: {title}\n\n"
-            f"PR Body:\n{description}\n\n"
-            f"PR Commits:\n- {"\n- ".join(commit_messages)}\n\n"
-            f"Diff:\n{diff}"
+    comments = {}
+    system_prompt = ai.prompt.load("system-prompt-code-file")
+    for filename in files:
+        prompt = manager.file_diff(filename)
+        if debug:
+            continue
+        comment = chat_completion(
+            system_prompt=system_prompt,
+            prompt=prompt,
+            model=llm_config.model,
         )
+        comments[filename] = comment
+    return comments
+
+
+def get_pr(cfg: config.GitHubConfig):
+    gh = github.Github(cfg.token)
+    repo = gh.get_repo(cfg.repository)
+    return repo.get_pull(cfg.pr_number)
 
 
 class App:
     def __init__(self, app_config: config.AppConfig):
         self._config = app_config
+        self._pr = get_pr(self._config.github)
+        self._chat_completion = ai.service.chat_completion(self._config.llm.strategy)
 
-        self._pr = get_pr(
-            self._config.github.token,
-            self._config.github.repository,
-            self._config.github.pr_number,
+    def _generate_feedback(self) -> model.Feedback:
+        context = review.manager.build_context(self._pr)
+        manager = review.manager.ReviewManager(context)
+        overview = manager.overview()
+        files = files_to_review(self._config.llm, overview)
+
+        comments = {}
+        system_prompt = ai.prompt.load("system-prompt-code-file")
+        for filename in files:
+            if self._config.debug:
+                continue
+
+            comment = self._chat_completion(
+                system_prompt=system_prompt,
+                prompt=manager.file_diff(filename),
+                model=self._config.llm.model,
+            )
+
+            comments[filename] = comment
+
+        overall_comment = ""
+
+        return model.Feedback(
+            comments=comments,
+            overall_comment=overall_comment,
         )
 
-    def _generate_review(self, comments: dict) -> Review:
-        pass
-
-    def _submit_review(self, review: Review):
-        for filename, comment in review.comments.items():
+    def _submit_review(self, feedback: model.Feedback):
+        for filename, comment in feedback.comments.items():
             print(filename)
             print("--------")
             print(comment)
@@ -118,11 +105,5 @@ class App:
             self._pr.create_review_comment(comment)
 
     def run(self):
-        comments = generate_file_comments(
-            self._pr,
-            self._config.llm.strategy,
-            self._config.llm.model,
-            debug=self._config.debug,
-        )
-        review = self._generate_review(comments)
+        review = self._generate_feedback()
         self._submit_review(review)
