@@ -38,5 +38,5 @@ class ReviewContext:
 
 @dataclasses.dataclass
 class Feedback:
-    comments: dict[Filename, Comment]
+    comments: dict[Filename, list[Comment]]
     overall_comment: Comment

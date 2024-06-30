@@ -48,6 +48,7 @@ class App:
         self._config = app_config
         self._pr = get_pr(self._config.github)
         self._chat_completion = ai.service.chat_completion(self._config.llm.strategy)
+        self._tool_completion = ai.service.tool_completion(self._config.llm.strategy)
 
     def _generate_feedback(self) -> model.Feedback:
         context = review.manager.build_context(self._pr)
@@ -64,16 +65,24 @@ class App:
         system_prompt = ai.prompt.load("system-prompt-code-file")
         for file in files:
             filename = file["filename"]
-            if self._config.debug:
-                continue
+            # if self._config.debug:
+            #     continue
 
-            comment = self._chat_completion(
+            results = self._tool_completion(
                 system_prompt=system_prompt,
                 prompt=manager.file_diff(filename),
                 model=self._config.llm.model,
+                tools=[
+                    ai.tool.post_feedback,
+                ],
+                tool_override="post_feedback",
             )
+            feedback = results["feedback"]
 
-            comments[filename] = comment
+            comments[filename] = [
+                comment["body"]
+                for comment in feedback
+            ]
 
         overall_comment = ""
 
@@ -83,17 +92,25 @@ class App:
         )
 
     def _submit_review(self, feedback: model.Feedback):
-        for filename, comment in feedback.comments.items():
-            print(filename)
+        commits = [commit for commit in self._pr.get_commits()]
+        commit = commits[-1]
+        for filename, comments in feedback.comments.items():
+            print(filename, len(comments))
             print("--------")
-            print(comment)
+            for comment in comments:
+                print(comment)
             print("========")
             print()
             if self._config.debug:
                 continue
 
-            self._pr.create_review_comment(comment)
+            for comment in comments:
+                self._pr.create_review_comment(
+                    body=comment,
+                    commit=commit,
+                    path=filename,
+                )
 
     def run(self):
-        review = self._generate_feedback()
-        self._submit_review(review)
+        feedback = self._generate_feedback()
+        self._submit_review(feedback)
