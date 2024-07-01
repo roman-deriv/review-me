@@ -22,7 +22,7 @@ class App:
         self._tool_completion = ai.service.tool_completion(self._config.llm.strategy)
 
     def _files_to_review(self, overview: str) -> list[dict[str, str]]:
-        system_prompt = ai.prompt.load("system-prompt-overview")
+        system_prompt = ai.prompt.load("overview")
         results = self._tool_completion(
             system_prompt=system_prompt,
             prompt=overview,
@@ -38,7 +38,7 @@ class App:
     def _generate_comments(self, manager, file):
         filename = file["filename"]
 
-        system_prompt = ai.prompt.load("system-prompt-code-file")
+        system_prompt = ai.prompt.load("file-review")
         results = self._tool_completion(
             system_prompt=system_prompt,
             prompt=manager.file_diff(filename),
@@ -62,7 +62,7 @@ class App:
             manager: review.manager.ReviewManager,
             comments: list[dict[str, str]],
     ) -> dict[str, str]:
-        system_prompt = ai.prompt.load("system-prompt-review-summary")
+        system_prompt = ai.prompt.load("review-summary")
         results = self._tool_completion(
             system_prompt=system_prompt,
             prompt=manager.review_summary(comments),
