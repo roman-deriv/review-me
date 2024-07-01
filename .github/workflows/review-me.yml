@@ -19,13 +19,6 @@ jobs:
           ref: refs/pull/${{ github.event.issue.number }}/merge
           fetch-depth: 0
 
-      - name: Debug Workspace
-        run: |
-          echo "Contents of workspace:"
-          ls -R
-          echo "Current directory:"
-          pwd
-
       - name: LLM Code Review
         uses: ./
         with:

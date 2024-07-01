@@ -4,6 +4,7 @@ from app import App
 
 def main():
     cfg = config.from_env()
+    print("***", cfg)
     app = App(cfg)
     app.run()
 
