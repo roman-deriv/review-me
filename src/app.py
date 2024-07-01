@@ -112,7 +112,7 @@ class App:
         self._pr.create_review(
             body=feedback.overall_comment,
             comments=feedback.comments,
-            event=feedback.evaluation,
+            event="COMMENT",
         )
 
     def run(self):
