@@ -57,7 +57,9 @@ post_feedback = {
                         },
                         "start_line": {
                             "type": "integer",
-                            "description": "Start line for multi-line comments"
+                            "description": "Start line for multi-line comments. "
+                                           "This MUST *precede* `line`, which is the "
+                                           "end line."
                         },
                         "start_side": {
                             "type": "string",
