@@ -2,22 +2,17 @@ name: LLM Code Review
 
 on:
   issue_comment:
-    types: [created]
+    types: [ created ]
 
 jobs:
   review:
     if: github.event.issue.pull_request && github.event.comment.body == '/review-me'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
+          ref: refs/pull/${{ github.event.issue.number }}/merge
           fetch-depth: 0
-
-      - name: Checkout PR
-        run: |
-          gh pr checkout ${{ github.event.issue.number }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: LLM Code Review
         uses: ./
