@@ -4,11 +4,6 @@ on:
   issue_comment:
     types: [ created ]
 
-permissions:
-  contents: read
-  pull-requests: write
-  issues: write
-
 jobs:
   review:
     if: github.event.issue.pull_request && github.event.comment.body == '/review-me'
@@ -22,4 +17,5 @@ jobs:
       - name: LLM Code Review
         uses: ./
         with:
+          github_token: ${{ github.token }}
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
