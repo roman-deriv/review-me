@@ -1,6 +1,9 @@
 name: LLM Code Review
 description: A GitHub Action to automate code review using LLMs.
 inputs:
+  github_token:
+    description: 'GitHub Token'
+    required: true
   anthropic_api_key:
     description: 'Anthropic API key'
     required: true
@@ -16,6 +19,7 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   env:
+    GITHUB_TOKEN: ${{ inputs.github_token }}
     ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}
     LLM_STRATEGY: ${{ inputs.llm_strategy }}
     MODEL: ${{ inputs.model }}
