@@ -57,6 +57,24 @@ class App:
 
         return comments
 
+    def _generate_review_summary(
+            self,
+            manager: review.manager.ReviewManager,
+            comments: list[dict[str, str]],
+    ) -> dict[str, str]:
+        system_prompt = ai.prompt.load("system-prompt-review-summary")
+        results = self._tool_completion(
+            system_prompt=system_prompt,
+            prompt=manager.review_summary(comments),
+            model=self._config.llm.model,
+            tools=[
+                ai.tool.submit_review,
+            ],
+            tool_override="submit_review",
+        )
+
+        return results
+
     def _generate_feedback(self) -> model.Feedback:
         context = review.manager.build_context(self._pr)
         manager = review.manager.ReviewManager(context)
@@ -72,12 +90,19 @@ class App:
         for file in files:
             comments += self._generate_comments(manager, file)
 
-        # TODO: get overall comment based on aggregate feedback
-        overall_comment = ""
+        review_summary = self._generate_review_summary(manager, comments)
+        overall_comment = review_summary["feedback"]
+        evaluation = review_summary["event"]
+        print()
+        print("OVERALL FEEDBACK")
+        print()
+        print(overall_comment)
+        print(evaluation)
 
         return model.Feedback(
             comments=comments,
             overall_comment=overall_comment,
+            evaluation=evaluation,
         )
 
     def _submit_review(self, feedback: model.Feedback):
@@ -87,7 +112,7 @@ class App:
         self._pr.create_review(
             body=feedback.overall_comment,
             comments=feedback.comments,
-            event="COMMENT",
+            event=feedback.evaluation,
         )
 
     def run(self):
