@@ -49,11 +49,11 @@ class ReviewManager:
         with open(filename, "r") as file:
             lines = file.readlines()
 
-        content = "\n".join([f"{i} | {line}" for i, line in enumerate(lines)])
+        content = "\n".join([f"{i} | {line}" for i, line in enumerate(lines, start=1)])
 
         return self._preamble() + (
             f"Original file:\n{content}\n\n"
-            f"----------"
+            f"----------\n"
             f"Diff for file: {filename}\n{self._context.diffs[filename]}"
         )
 
