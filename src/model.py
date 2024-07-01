@@ -40,3 +40,4 @@ class ReviewContext:
 class Feedback:
     comments: list[dict[str, str]]
     overall_comment: Comment
+    evaluation: str

@@ -9,3 +9,9 @@ Keep your comments as CLEAR and CONCISE as possible.
 Use multi-line comments where appropriate.
 Avoid excessive praise or kudos, only comment if there is a good reason.
 DO NOT add multiple comments on the same line.
+DO NOT add comments unless something is wrong.
+DO NOT add comments simply to praise the author.
+DO NOT add comments if they are not constructive feedback.
+The fewer comments, the better.
+Only include comments if absolutely necessary.
+It is okay to have not comments on a file.

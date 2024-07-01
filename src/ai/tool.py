@@ -26,6 +26,7 @@ review_files = {
         "required": ["files"]
     }
 }
+
 post_feedback = {
     "name": "post_feedback",
     "description": "Create GitHub pull request review comments from the provided "
@@ -56,7 +57,9 @@ post_feedback = {
                         },
                         "start_line": {
                             "type": "integer",
-                            "description": "Start line for multi-line comments"
+                            "description": "Start line for multi-line comments. "
+                                           "This MUST *precede* `line`, which is the "
+                                           "end line."
                         },
                         "start_side": {
                             "type": "string",
@@ -75,5 +78,28 @@ post_feedback = {
             }
         },
         "required": ["feedback"]
+    }
+}
+
+submit_review = {
+    "name": "submit_review",
+    "description": "Provide a final evaluation for the GitHub pull request. "
+                   "This tool should be used after generating individual comments to "
+                   "create an overall summary and determine the final review action "
+                   "(approve, comment, or request changes).",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "feedback": {
+                "type": "string",
+                "description": "Final thoughts and overall feedback on the Pull Request"
+            },
+            "event": {
+                "type": "string",
+                "enum": ["APPROVE", "COMMENT", "REQUEST_CHANGES"],
+                "description": "The final review action to take"
+            },
+        },
+        "required": ["feedback", "event"]
     }
 }

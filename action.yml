@@ -1,15 +1,21 @@
 name: LLM Code Review
 description: A GitHub Action to automate code review using LLMs.
 inputs:
-  openai_api_key:
-    description: 'OpenAI API key'
+  anthropic_api_key:
+    description: 'Anthropic API key'
     required: true
-  github_token:
-    description: 'GitHub token'
+  llm_strategy:
+    description: 'The LLM strategy to use'
     required: true
+    default: 'anthropic'
+  model:
+    description: 'Name of the LLM to use'
+    required: true
+    default: 'claude-3-5-sonnet-20240620'
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  args:
-    - ${{ inputs.openai_api_key }}
-    - ${{ inputs.github_token }}
+  env:
+    ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}
+    LLM_STRATEGY: ${{ inputs.llm_strategy }}
+    MODEL: ${{ inputs.model }}
