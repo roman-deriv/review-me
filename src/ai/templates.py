@@ -5,7 +5,8 @@ def load():
     loaded = dict(
         preamble = env.get_template('preamble.txt'),
         overview = env.get_template('overview.txt'),
-        file_diff = env.get_template('file_diff.txt')
+        file_diff = env.get_template('file_diff.txt'),
+        review_summary = env.get_template('review_summary.txt')
     )
     return loaded
 
@@ -34,5 +35,9 @@ def file_diff():
                                               diff="test_file_diff",
                                               file=openfile.readlines()
                                              )
+    
+def review_summary():
+    return preamble() + templates['review_summary'].render(comments=['These', 'Are', 'Test', 'Comments']
+)
 
-print(file_diff())
+print(review_summary())
