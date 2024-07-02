@@ -34,6 +34,9 @@ class ReviewContext:
     issue_comments: list[Comment]
     review_comments: list[Comment]
     diffs: dict[Filename, FileDiff]
+    added_files: list[Filename]
+    modified_files: list[Filename]
+    deleted_files: list[Filename]
 
 
 @dataclasses.dataclass

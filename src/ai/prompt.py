@@ -28,7 +28,12 @@ class Builder:
             f"Diff for file: {filename}\n{diff}"
             for filename, diff in diffs.items()
         ])
-        return self._preamble() + f"Changes:\n{combined_diff}"
+        return self._preamble() + (
+            f"Files Added: {self._context.added_files}\n"
+            f"Files Deleted: {self._context.deleted_files}\n"
+            f"Files Modified: {self._context.modified_files}\n"
+            f"Changes:\n{combined_diff}"
+        )
 
     def file_diff(self, filename: str) -> str:
         with open(filename, "r") as file:

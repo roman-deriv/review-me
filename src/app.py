@@ -15,6 +15,7 @@ def get_pr(cfg: config.GitHubConfig):
 
 
 def build_context(pull_request: PullRequest) -> model.ReviewContext:
+    files = pull_request.get_files()
     return model.ReviewContext(
         title=pull_request.title,
         description=pull_request.body,
@@ -32,8 +33,11 @@ def build_context(pull_request: PullRequest) -> model.ReviewContext:
         ],
         diffs={
             file.filename: file.patch
-            for file in pull_request.get_files()
-        }
+            for file in files
+        },
+        added_files=[file.filename for file in files if file.status == 'added'],
+        modified_files=[file.filename for file in files if file.status == 'modified'],
+        deleted_files=[file.filename for file in files if file.status == 'removed']
     )
 
 
