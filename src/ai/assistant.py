@@ -38,7 +38,19 @@ class Assistant:
             ],
             tool_override="post_feedback",
         )
-        return results["feedback"]
+
+        comments = []
+        for comment in results["feedback"]:
+            # override path for determinism
+            comment.update(path=filename)
+            # replace `end_line` with `line`
+            comment.update(line=comment.pop("end_line"))
+            # replace `end_side` with `side`
+            comment.update(side=comment.pop("end_side"))
+
+            comments.append(comment)
+
+        return comments
 
     def get_feedback(
             self,

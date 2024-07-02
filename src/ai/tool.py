@@ -48,23 +48,24 @@ post_feedback = {
                             "type": "string",
                             "description": "The original file path"
                         },
-                        "line": {
+                        "end_line": {
                             "type": "integer",
                             "description": "The line number in the file to comment on. "
-                                           "This can be omitted for file comments."
-                        },
-                        "side": {
-                            "type": "string",
-                            "enum": ["LEFT", "RIGHT"],
-                            "description": "LEFT for original code, "
-                                           "RIGHT for modified code"
+                                           "Also the end line in multi-line comments. "
+                                           "MUST be *greater than* `start_line`."
                         },
                         "start_line": {
                             "type": "integer",
                             "description": "Start line for multi-line comments. "
-                                           "This MUST *precede* `line`, which is the "
-                                           "end line. The start line MUST be in the "
+                                           "MUST be *less than* `end_line`. "
+                                           "The start line MUST be in the "
                                            "same hunk as the end line."
+                        },
+                        "end_side": {
+                            "type": "string",
+                            "enum": ["LEFT", "RIGHT"],
+                            "description": "LEFT for original code, "
+                                           "RIGHT for modified code"
                         },
                         "start_side": {
                             "type": "string",
@@ -78,7 +79,7 @@ post_feedback = {
                                            "section of code"
                         },
                     },
-                    "required": ["path", "line", "body"]
+                    "required": ["path", "end_line", "body"]
                 }
             }
         },

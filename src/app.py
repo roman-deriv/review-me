@@ -62,8 +62,6 @@ class App:
 
             file_comments = self._assistant.review_file(req.path)
             for comment in file_comments:
-                # override path for determinism
-                comment.update(path=req.path)
                 print(comment)
                 print("--------")
 
