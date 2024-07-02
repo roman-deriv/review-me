@@ -24,10 +24,10 @@ class Builder:
 
     def overview(self) -> str:
         diffs = self._context.diffs
-        combined_diff = "\n".join([
+        combined_diff = "\n".join(
             f"Diff for file: {filename}\n{diff}"
             for filename, diff in diffs.items()
-        ])
+        )
         return self._preamble() + (
             f"Files Added: {self._context.added_files}\n"
             f"Files Deleted: {self._context.deleted_files}\n"
