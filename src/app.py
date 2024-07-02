@@ -61,9 +61,7 @@ class App:
             print()
             filename = file["filename"]
 
-            results = self._assistant.review_file(filename)
-
-            file_comments = results["feedback"]
+            file_comments = self._assistant.review_file(filename)
             for comment in file_comments:
                 comment.update(path=filename)
                 print(comment)

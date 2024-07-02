@@ -21,9 +21,9 @@ class Assistant:
         )
         return results["files"]
 
-    def review_file(self, filename):
+    def review_file(self, filename: str) -> list[model.Comment]:
         system_prompt = prompt.load("file-review")
-        return tool_completion(
+        results = tool_completion(
             system_prompt=system_prompt,
             prompt=self._builder.file_diff(filename),
             model=self._model,
@@ -32,6 +32,7 @@ class Assistant:
             ],
             tool_override="post_feedback",
         )
+        return results["feedback"]
 
     def get_feedback(
             self,
