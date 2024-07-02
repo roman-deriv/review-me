@@ -30,7 +30,9 @@ def overview():
 
 def file_diff():
     with open("src/ai/templates.py", "r") as openfile:
-        return templates['file_diff'].render(file=openfile.readlines(),
+        return templates['file_diff'].render(filename="test_file_name",
+                                              diff="test_file_diff",
+                                              file=openfile.readlines()
                                              )
 
 print(file_diff())
