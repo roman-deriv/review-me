@@ -1,14 +1,14 @@
 from jinja2 import Environment, PackageLoader
 
-def load_templates():
+def load():
     env = Environment(loader=PackageLoader('templates'))
-    loaded = []
-    loaded.append(env.get_template('Preamble.txt'))
-    loaded.append(env.get_template('test2.txt'))
+    loaded = dict(
+        preamble = env.get_template('preamble.txt')
+    )
     return loaded
 
-templates = load_templates()
-print(templates[0].render( 
+templates = load()
+print(templates['preamble'].render( 
                           title="Test Title",
                           description="Test Description",
                           commit_messages=["Test", "Commit", "Messages"]
