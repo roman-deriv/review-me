@@ -45,7 +45,7 @@ post_feedback = {
                     "type": "object",
                     "properties": {
                         "path": {
-                            "type": "integer",
+                            "type": "string",
                             "description": "The original file path"
                         },
                         "line": {
@@ -78,7 +78,7 @@ post_feedback = {
                                            "section of code"
                         },
                     },
-                    "required": ["body", "path"]
+                    "required": ["path", "line", "body"]
                 }
             }
         },
