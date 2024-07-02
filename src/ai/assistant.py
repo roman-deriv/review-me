@@ -43,10 +43,12 @@ class Assistant:
         for comment in results["feedback"]:
             # override path for determinism
             comment.update(path=filename)
-            # replace `end_line` with `line`
-            comment.update(line=comment.pop("end_line"))
-            # replace `end_side` with `side`
-            comment.update(side=comment.pop("end_side"))
+            if "end_line" in comment:
+                # replace `end_line` with `line`
+                comment.update(line=comment.pop("end_line"))
+            if "end_side" in comment:
+                # replace `end_side` with `side`
+                comment.update(side=comment.pop("end_side"))
 
             comments.append(comment)
 
