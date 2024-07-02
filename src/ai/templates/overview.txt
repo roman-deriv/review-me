@@ -1,0 +1,5 @@
+{% for filename, diff in diffs.items() -%}
+Diff for file: {{filename}}
+{{diff}}
+
+{% endfor %}
