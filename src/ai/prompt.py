@@ -1,5 +1,6 @@
 import pathlib
 
+from ai import templates
 import model
 
 PROMPT_DIR = pathlib.Path(__file__).parent / "prompts"
@@ -16,13 +17,18 @@ class Builder:
         self._context = context
 
     def _preamble(self) -> str:
+        '''
         return (
             f"PR Title: {self._context.title}\n\n"
             f"PR Body:\n{self._context.description}\n\n"
             f"PR Commits:\n- {"\n- ".join(self._context.commit_messages)}\n\n"
         )
+        '''
+        return templates.preamble(self._context)
+        
 
     def overview(self) -> str:
+        '''
         diffs = self._context.diffs
         combined_diff = "\n".join(
             f"Diff for file: {filename}\n{diff}"
@@ -34,8 +40,11 @@ class Builder:
             f"Files Modified: {self._context.modified_files}\n"
             f"Changes:\n{combined_diff}"
         )
+        '''
+        return templates.overview(self._context)
 
     def file_diff(self, filename: str) -> str:
+        '''
         with open(filename, "r") as file:
             content = "\n".join(
                 f"{i} | {line}"
@@ -47,8 +56,13 @@ class Builder:
             f"----------\n"
             f"Diff for file: {filename}\n{self._context.diffs[filename]}"
         )
+        '''
+        return templates.file_diff(self._context, filename)
 
     def review_summary(self, comments: list[model.Comment]) -> str:
+        '''
         return self._preamble() + (
             f"Current Feedback:\n{comments}"
         )
+        '''
+        return templates.review_summary(self._context, comments)
