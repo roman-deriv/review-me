@@ -63,13 +63,13 @@ class App:
 
             results = self._assistant.review_file(filename)
 
-            comments = results["feedback"]
-            for comment in comments:
+            file_comments = results["feedback"]
+            for comment in file_comments:
                 comment.update(path=filename)
                 print(comment)
                 print("--------")
 
-            comments += comments
+            comments += file_comments
 
         review_summary = self._assistant.get_feedback(comments)
         overall_comment = review_summary["feedback"]
