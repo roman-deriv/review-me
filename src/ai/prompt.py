@@ -39,7 +39,7 @@ class Builder:
         with open(filename, "r") as file:
             lines = file.readlines()
 
-        content = "\n".join([f"{i} | {line}" for i, line in enumerate(lines, start=1)])
+        content = "\n".join(f"{i} | {line}" for i, line in enumerate(lines, start=1))
 
         return self._preamble() + (
             f"Original file: {filename}\n{content}\n\n"
