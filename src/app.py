@@ -71,20 +71,12 @@ class App:
 
             comments += file_comments
 
-        review_summary = self._assistant.get_feedback(comments)
-        overall_comment = review_summary["feedback"]
-        evaluation = review_summary["event"]
+        feedback = self._assistant.get_feedback(comments)
         print()
         print("OVERALL FEEDBACK")
         print()
-        print(overall_comment)
-        print(evaluation)
-
-        return model.Feedback(
-            comments=comments,
-            overall_comment=overall_comment,
-            evaluation=evaluation,
-        )
+        print(feedback)
+        return feedback
 
     def _submit_review(self, feedback: model.Feedback):
         if self._config.debug:

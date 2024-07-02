@@ -1,3 +1,4 @@
+import model
 from . import prompt, tool
 from .anthropic import tool_completion
 
@@ -35,9 +36,9 @@ class Assistant:
     def get_feedback(
             self,
             comments: list[dict[str, str]],
-    ) -> dict[str, str]:
+    ) -> model.Feedback:
         system_prompt = prompt.load("review-summary")
-        return tool_completion(
+        response = tool_completion(
             system_prompt=system_prompt,
             prompt=self._builder.review_summary(comments),
             model=self._model,
@@ -45,4 +46,9 @@ class Assistant:
                 tool.submit_review,
             ],
             tool_override="submit_review",
+        )
+        return model.Feedback(
+            comments=comments,
+            overall_comment=response["feedback"],
+            evaluation=response["event"],
         )
