@@ -44,22 +44,30 @@ post_feedback = {
                 "items": {
                     "type": "object",
                     "properties": {
-                        "line": {
+                        "path": {
+                            "type": "string",
+                            "description": "The original file path"
+                        },
+                        "end_line": {
                             "type": "integer",
                             "description": "The line number in the file to comment on. "
-                                           "This can be omitted for file comments."
+                                           "Also the end line in multi-line comments "
+                                           "(inclusive). "
+                                           "MUST be *greater than* `start_line`."
                         },
-                        "side": {
+                        "start_line": {
+                            "type": "integer",
+                            "description": "Start line for multi-line comments "
+                                           "(inclusive). "
+                                           "MUST be *less than* `end_line`. "
+                                           "The start line MUST be in the "
+                                           "same hunk as the end line."
+                        },
+                        "end_side": {
                             "type": "string",
                             "enum": ["LEFT", "RIGHT"],
                             "description": "LEFT for original code, "
                                            "RIGHT for modified code"
-                        },
-                        "start_line": {
-                            "type": "integer",
-                            "description": "Start line for multi-line comments. "
-                                           "This MUST *precede* `line`, which is the "
-                                           "end line."
                         },
                         "start_side": {
                             "type": "string",
@@ -73,7 +81,7 @@ post_feedback = {
                                            "section of code"
                         },
                     },
-                    "required": ["body"]
+                    "required": ["path", "end_line", "body"]
                 }
             }
         },

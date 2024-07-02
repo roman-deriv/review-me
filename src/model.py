@@ -3,7 +3,8 @@ import dataclasses
 type Filename = str
 type FileDiff = str
 type CommitMessage = str
-type Comment = str
+type CommentBody = str
+type Comment = dict[str, str]
 
 
 @dataclasses.dataclass
@@ -27,17 +28,25 @@ class AppConfig:
 
 
 @dataclasses.dataclass
+class FileReviewRequest:
+    path: str
+    reason: str
+
+@dataclasses.dataclass
 class ReviewContext:
     title: str
     description: str
     commit_messages: list[CommitMessage]
-    issue_comments: list[Comment]
-    review_comments: list[Comment]
+    issue_comments: list[CommentBody]
+    review_comments: list[CommentBody]
     diffs: dict[Filename, FileDiff]
+    added_files: list[Filename]
+    modified_files: list[Filename]
+    deleted_files: list[Filename]
 
 
 @dataclasses.dataclass
 class Feedback:
-    comments: list[dict[str, str]]
-    overall_comment: Comment
+    comments: list[Comment]
+    overall_comment: CommentBody
     evaluation: str
