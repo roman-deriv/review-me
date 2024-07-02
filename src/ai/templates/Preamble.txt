@@ -1,0 +1,9 @@
+PR Title: {{title}}
+
+PR Body:
+{{description}}
+
+PR Commits:
+{% for item in commit_messages -%}
+- {{item}}
+{% endfor %}
