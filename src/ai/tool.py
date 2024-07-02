@@ -59,7 +59,8 @@ post_feedback = {
                             "type": "integer",
                             "description": "Start line for multi-line comments. "
                                            "This MUST *precede* `line`, which is the "
-                                           "end line."
+                                           "end line. The start line MUST be in the "
+                                           "same hunk as the end line."
                         },
                         "start_side": {
                             "type": "string",
