@@ -44,6 +44,10 @@ post_feedback = {
                 "items": {
                     "type": "object",
                     "properties": {
+                        "path": {
+                            "type": "integer",
+                            "description": "The original file path"
+                        },
                         "line": {
                             "type": "integer",
                             "description": "The line number in the file to comment on. "
@@ -74,7 +78,7 @@ post_feedback = {
                                            "section of code"
                         },
                     },
-                    "required": ["body"]
+                    "required": ["body", "path"]
                 }
             }
         },
