@@ -1,5 +1,9 @@
+Files Added: {{added_files}}
+Files Deleted: {{deleted_files}}
+Files Modified: {{modified_files}}
+Changes:
 {% for filename, diff in diffs.items() -%}
 Diff for file: {{filename}}
 {{diff}}
-
 {% endfor %}
+
