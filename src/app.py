@@ -51,19 +51,19 @@ class App:
         self._assistant = ai.assistant.Assistant(app_config.llm.model, builder)
 
     def _generate_feedback(self) -> model.Feedback:
-        files = self._assistant.files_to_review()
+        review_requests = self._assistant.files_to_review()
 
-        comments: list[dict[str, str]] = []
+        comments: list[model.Comment] = []
         print("We should review these files")
-        for file in files:
-            print("Filename:", file["filename"])
-            print("Reason:", file["reason"])
+        for req in review_requests:
+            print("Filename:", req.path)
+            print("Reason:", req.reason)
             print()
-            filename = file["filename"]
 
-            file_comments = self._assistant.review_file(filename)
+            file_comments = self._assistant.review_file(req.path)
             for comment in file_comments:
-                comment.update(path=filename)
+                # override path for determinism
+                comment.update(path=req.path)
                 print(comment)
                 print("--------")
 

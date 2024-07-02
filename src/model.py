@@ -28,6 +28,11 @@ class AppConfig:
 
 
 @dataclasses.dataclass
+class FileReviewRequest:
+    path: str
+    reason: str
+
+@dataclasses.dataclass
 class ReviewContext:
     title: str
     description: str
