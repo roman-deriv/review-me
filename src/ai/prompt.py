@@ -47,7 +47,7 @@ class Builder:
             f"Diff for file: {filename}\n{self._context.diffs[filename]}"
         )
 
-    def review_summary(self, comments: list[dict[str, str]]):
+    def review_summary(self, comments: list[model.Comment]) -> str:
         return self._preamble() + (
             f"Current Feedback:\n{comments}"
         )
