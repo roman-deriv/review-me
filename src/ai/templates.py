@@ -13,16 +13,16 @@ templates = load()
 
 def preamble():
     return templates['preamble'].render( 
-                            title = "Test Title",
-                            description = "Test Description",
+                            title = "Test_Title",
+                            description = "Test_Description",
                             commit_messages = ["Test", "Commit", "Messages"]
                           )
 
 def overview():
     return preamble() + templates['overview'].render(
-                            added_files = "added files (test)",
-                            deleted_files = "deleted files (test)",
-                            modified_files = "modified files (test)",
+                            added_files = "added_files_(test)",
+                            deleted_files = "deleted_files_(test)",
+                            modified_files = "modified_files_(test)",
                             diffs={
                                 "filename1":"diff1",
                                 "filename2":"diff2"
@@ -30,7 +30,7 @@ def overview():
 
 def file_diff():
     with open("src/ai/templates.py", "r") as openfile:
-        return templates['file_diff'].render(filename="test_file_name",
+        return preamble() + templates['file_diff'].render(filename="test_file_name",
                                               diff="test_file_diff",
                                               file=openfile.readlines()
                                              )

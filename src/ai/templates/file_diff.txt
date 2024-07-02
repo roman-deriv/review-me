@@ -6,3 +6,4 @@ Original file: {{filename}}
 
 Diff for file: {{filename}}
 {{diff}}
+
