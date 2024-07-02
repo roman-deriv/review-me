@@ -56,7 +56,7 @@ class Assistant:
 
     def get_feedback(
             self,
-            comments: list[dict[str, str]],
+            comments: list[model.Comment],
     ) -> model.Feedback:
         system_prompt = prompt.load("review-summary")
         response = tool_completion(
