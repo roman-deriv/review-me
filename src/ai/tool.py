@@ -51,12 +51,14 @@ post_feedback = {
                         "end_line": {
                             "type": "integer",
                             "description": "The line number in the file to comment on. "
-                                           "Also the end line in multi-line comments. "
+                                           "Also the end line in multi-line comments "
+                                           "(inclusive). "
                                            "MUST be *greater than* `start_line`."
                         },
                         "start_line": {
                             "type": "integer",
-                            "description": "Start line for multi-line comments. "
+                            "description": "Start line for multi-line comments "
+                                           "(inclusive). "
                                            "MUST be *less than* `end_line`. "
                                            "The start line MUST be in the "
                                            "same hunk as the end line."
