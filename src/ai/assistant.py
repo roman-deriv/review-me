@@ -52,7 +52,7 @@ class Assistant:
             if "end_line" in comment:
                 if "start_line" in comment:
                     if int(comment["start_line"]) >= int(comment["end_line"]):
-                        comment.pop("start_line")
+                        del comment["start_line"]
 
                 # replace `end_line` with `line`
                 comment.update(line=comment.pop("end_line"))
