@@ -1,4 +1,4 @@
-{% extends 'review-base.md' %}
+{% extends 'user/review-base.md' %}
 
 {% block content -%}
 {%- if context.added_files -%}
