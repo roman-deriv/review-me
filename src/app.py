@@ -57,7 +57,7 @@ def build_context(pull_request: PullRequest) -> model.ReviewContext:
 
 class App:
     def __init__(self, app_config: config.AppConfig):
-        logger.debug("creating App")
+        logger.debug("creating App start")
         self._config = app_config
         self._pr = get_pr(self._config.github)
 
