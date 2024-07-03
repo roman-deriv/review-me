@@ -1,4 +1,0 @@
-Current Feedback:
-{% for line in comment -%}
-{{line}}
-{% endfor -%}
