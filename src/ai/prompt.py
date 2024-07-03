@@ -17,7 +17,7 @@ class Builder:
     def __init__(self, context: model.ReviewContext):
         self._context = context
         self._user_templates = jinja2.Environment(
-            loader=jinja2.FileSystemLoader('ai/user'),
+            loader=jinja2.FileSystemLoader(PROMPT_DIR / 'user'),
         )
 
     def overview(self) -> str:
