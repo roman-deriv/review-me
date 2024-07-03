@@ -1,4 +1,5 @@
 import github
+import logging
 from github.PullRequest import PullRequest
 
 import ai.assistant
@@ -8,15 +9,26 @@ import config
 import model
 
 
+logging.basicConfig(level=logging.DEBUG, 
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    handlers=[logging.FileHandler('review-me.log'), logging.StreamHandler()])
+
+logger = logging.getLogger(__name__)
+
+
 def get_pr(cfg: config.GitHubConfig):
+    logger.debug("get_pr start")
     gh = github.Github(cfg.token)
     repo = gh.get_repo(cfg.repository)
-    return repo.get_pull(cfg.pr_number)
+    pr = repo.get_pull(cfg.pr_number)
+    logger.debug("get_pr finish")
+    return pr
 
 
 def build_context(pull_request: PullRequest) -> model.ReviewContext:
+    logger.debug("build_context start")
     files = pull_request.get_files()
-    return model.ReviewContext(
+    context = model.ReviewContext(
         title=pull_request.title,
         description=pull_request.body,
         commit_messages=[
@@ -39,18 +51,23 @@ def build_context(pull_request: PullRequest) -> model.ReviewContext:
         modified_files=[file.filename for file in files if file.status == 'modified'],
         deleted_files=[file.filename for file in files if file.status == 'removed']
     )
+    logger.debug("build_context finish")
+    return context
 
 
 class App:
     def __init__(self, app_config: config.AppConfig):
+        logger.debug("creating App")
         self._config = app_config
         self._pr = get_pr(self._config.github)
 
         context = build_context(self._pr)
         builder = ai.prompt.Builder(context)
         self._assistant = ai.assistant.Assistant(app_config.llm.model, builder)
+        logger.debug("creating App finish")
 
     def _generate_feedback(self) -> model.Feedback:
+        logger.debug("generate_feedback start")
         review_requests = self._assistant.files_to_review()
 
         comments: list[model.Comment] = []
@@ -72,10 +89,13 @@ class App:
         print("OVERALL FEEDBACK")
         print()
         print(feedback)
+        logger.debug("generate_feedback finish")
         return feedback
 
     def _submit_review(self, feedback: model.Feedback):
+        logger.debug("_submit_review start")
         if self._config.debug:
+            logger.debug("_submit_review debug return")
             return
 
         self._pr.create_review(
@@ -83,7 +103,10 @@ class App:
             comments=feedback.comments,
             event="COMMENT",
         )
+        logger.debug("_submit_review finish")
 
     def run(self):
+        logger.debug("run start")
         feedback = self._generate_feedback()
         self._submit_review(feedback)
+        logger.debug("run finish")
