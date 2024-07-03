@@ -73,24 +73,17 @@ class App:
         comments: list[model.Comment] = []
         logger.info("Files being reviewed:")
         for req in review_requests:
-            logger.info("Filename:")
-            logger.info(req.path)
-            logger.info("Reason:")
-            logger.info(req.reason)
-            logger.info('')
+            logger.info("Filename: %s", req.path)
+            logger.info("Reason: %s", req.reason)
 
             file_comments = self._assistant.review_file(req.path)
             for comment in file_comments:
-                logger.info(comment)
-                logger.info("--------")
+                logger.info("Comment: %s", comment)
 
             comments += file_comments
 
         feedback = self._assistant.get_feedback(comments)
-        logger.info('')
-        logger.info("OVERALL FEEDBACK:")
-        logger.info('')
-        logger.info(feedback)
+        logger.info("OVERALL FEEDBACK: %s", feedback)
         logger.debug("generate_feedback finish")
         return feedback
 
