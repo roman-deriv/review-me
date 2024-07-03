@@ -1,25 +1,18 @@
 import model
-import logging
+import logs
 from . import prompt, tool
 from .anthropic import tool_completion
 
 
-logging.basicConfig(level=logging.DEBUG, 
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    handlers=[logging.FileHandler('review-me.log'), logging.StreamHandler()])
-
-logger = logging.getLogger(__name__)
-
-
 class Assistant:
     def __init__(self, model_name: str, builder: prompt.Builder):
-        logger.debug("creating Builder start")
+        logs.debug("creating Builder start")
         self._model_name = model_name
         self._builder = builder
-        logger.debug("creating Builder finish")
+        logs.debug("creating Builder finish")
 
     def files_to_review(self) -> list[model.FileReviewRequest]:
-        logger.debug("files_to_review start")
+        logs.debug("files_to_review start")
         system_prompt = prompt.load("overview")
         results = tool_completion(
             system_prompt=system_prompt,
@@ -37,11 +30,11 @@ class Assistant:
             )
             for req in results["files"]
         ]
-        logger.debug("files_to_review finish")
+        logs.debug("files_to_review finish")
         return files
 
     def review_file(self, filename: str) -> list[model.Comment]:
-        logger.debug("review_file start")
+        logs.debug("review_file start")
         system_prompt = prompt.load("file-review")
 
         with open(filename, "r") as file:
@@ -70,14 +63,14 @@ class Assistant:
 
             comments.append(comment)
 
-        logger.debug("review_file finish")
+        logs.debug("review_file finish")
         return comments
 
     def get_feedback(
             self,
             comments: list[model.Comment],
     ) -> model.Feedback:
-        logger.debug("get_feedback start")
+        logs.debug("get_feedback start")
         system_prompt = prompt.load("review-summary")
         response = tool_completion(
             system_prompt=system_prompt,
@@ -93,5 +86,5 @@ class Assistant:
             overall_comment=response["feedback"],
             evaluation=response["event"],
         )
-        logger.debug("get_feedback finish")
+        logs.debug("get_feedback finish")
         return feedback

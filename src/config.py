@@ -1,19 +1,13 @@
 import json
 import os
-import logging
 
+
+import logs
 from model import AppConfig, GitHubConfig, LlmConfig
 
 
-logging.basicConfig(level=logging.DEBUG, 
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    handlers=[logging.FileHandler('review-me.log'), logging.StreamHandler()])
-
-logger = logging.getLogger(__name__)
-
-
 def from_env() -> AppConfig:
-    logger.debug("from_env start")
+    logs.debug("from_env start")
     debug = bool(os.environ.get("DEBUG", False))
 
     github_token = os.environ.get("GITHUB_TOKEN")
@@ -41,5 +35,5 @@ def from_env() -> AppConfig:
         debug=debug,
     )
 
-    logger.debug("from_env finish")
+    logs.debug("from_env finish")
     return config
