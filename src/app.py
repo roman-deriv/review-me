@@ -1,3 +1,5 @@
+import asyncio
+
 import github
 from github.PullRequest import PullRequest
 
@@ -58,16 +60,16 @@ class App:
     async def _generate_feedback(self) -> model.Feedback:
         review_requests = await self._assistant.files_to_review()
 
-        comments: list[model.Comment] = []
-        for req in review_requests:
+        file_reviews = await asyncio.gather(*[
+            self._assistant.review_file(req.path)
+            for req in review_requests
+        ])
 
-            file_comments = await self._assistant.review_file(req.path)
-            for comment in file_comments:
-                logger.log.debug(f"Filename: {req.path}")
-                logger.log.debug(f"Reason: {req.reason}")
-                logger.log.debug(f"Comment: {comment}")
-
-            comments += file_comments
+        comments: list[model.Comment] = [
+            comment
+            for file_comments in file_reviews
+            for comment in file_comments
+        ]
 
         feedback = await self._assistant.get_feedback(comments)
         logger.log.debug(f"Overall Feedback: {feedback}")
