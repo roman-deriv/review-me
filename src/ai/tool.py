@@ -33,7 +33,8 @@ post_feedback = {
                    "feedback. This tool should be used to post detailed, "
                    "line-specific comments on code changes. Each feedback item "
                    "should correspond to a specific location in the code, identified "
-                   "by line number. Use this for constructive feedback, suggestions "
+                   "by line number. Each line number MUST belong to a hunk in the "
+                   "file diff. Use this for constructive feedback, suggestions "
                    "for improvement, or highlighting potential issues in the code. "
                    "Ensure comments are clear, specific, and actionable.",
     "input_schema": {
