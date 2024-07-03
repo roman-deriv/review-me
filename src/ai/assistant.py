@@ -8,9 +8,9 @@ class Assistant:
         self._model_name = model_name
         self._builder = builder
 
-    def files_to_review(self) -> list[model.FileReviewRequest]:
+    async def files_to_review(self) -> list[model.FileReviewRequest]:
         system_prompt = prompt.load("overview")
-        results = tool_completion(
+        results = await tool_completion(
             system_prompt=system_prompt,
             prompt=self._builder.overview(),
             model=self._model_name,
@@ -29,13 +29,13 @@ class Assistant:
         logger.log.debug(f"Files to review: {files}")
         return files
 
-    def review_file(self, filename: str) -> list[model.Comment]:
+    async def review_file(self, filename: str) -> list[model.Comment]:
         system_prompt = prompt.load("file-review")
 
         with open(filename, "r") as file:
             source_code = file.readlines()
 
-        results = tool_completion(
+        results = await tool_completion(
             system_prompt=system_prompt,
             prompt=self._builder.file_diff(filename, source_code),
             model=self._model_name,
@@ -60,12 +60,12 @@ class Assistant:
 
         return comments
 
-    def get_feedback(
+    async def get_feedback(
             self,
             comments: list[model.Comment],
     ) -> model.Feedback:
         system_prompt = prompt.load("review-summary")
-        response = tool_completion(
+        response = await tool_completion(
             system_prompt=system_prompt,
             prompt=self._builder.review_summary(comments),
             model=self._model_name,

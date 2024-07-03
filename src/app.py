@@ -55,13 +55,13 @@ class App:
         builder = ai.prompt.Builder(context)
         self._assistant = ai.assistant.Assistant(app_config.llm.model, builder)
 
-    def _generate_feedback(self) -> model.Feedback:
-        review_requests = self._assistant.files_to_review()
+    async def _generate_feedback(self) -> model.Feedback:
+        review_requests = await self._assistant.files_to_review()
 
         comments: list[model.Comment] = []
         for req in review_requests:
 
-            file_comments = self._assistant.review_file(req.path)
+            file_comments = await self._assistant.review_file(req.path)
             for comment in file_comments:
                 logger.log.debug(f"Filename: {req.path}")
                 logger.log.debug(f"Reason: {req.reason}")
@@ -69,7 +69,7 @@ class App:
 
             comments += file_comments
 
-        feedback = self._assistant.get_feedback(comments)
+        feedback = await self._assistant.get_feedback(comments)
         logger.log.debug(f"Overall Feedback: {feedback}")
         return feedback
 
@@ -84,6 +84,6 @@ class App:
             event="COMMENT",
         )
 
-    def run(self):
-        feedback = self._generate_feedback()
+    async def run(self):
+        feedback = await self._generate_feedback()
         self._submit_review(feedback)
