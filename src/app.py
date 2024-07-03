@@ -1,4 +1,5 @@
 import asyncio
+from asyncio import Semaphore
 
 import github
 from github.PullRequest import PullRequest
@@ -60,15 +61,26 @@ class App:
     async def _generate_feedback(self) -> model.Feedback:
         review_requests = await self._assistant.files_to_review()
 
+        # Use a semaphore to limit the rate of requests
+        semaphore = Semaphore(1)
+
+        async def rate_limited_review(req):
+            async with semaphore:
+                file_comments = await self._assistant.review_file(req.path)
+                for comment in file_comments:
+                    print(comment)
+                    print("--------")
+                await asyncio.sleep(1.5)  # Wait 1.5 seconds between requests
+                return file_comments
+
+        # Run file reviews in parallel with rate limiting
         file_reviews = await asyncio.gather(*[
-            self._assistant.review_file(req.path)
-            for req in review_requests
+            rate_limited_review(req) for req in review_requests
         ])
 
+        # Flatten the list of comments
         comments: list[model.Comment] = [
-            comment
-            for file_comments in file_reviews
-            for comment in file_comments
+            comment for file_comments in file_reviews for comment in file_comments
         ]
 
         feedback = await self._assistant.get_feedback(comments)
