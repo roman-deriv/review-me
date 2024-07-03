@@ -95,7 +95,7 @@ class App:
     def _submit_review(self, feedback: model.Feedback):
         logger.debug("_submit_review start")
         if self._config.debug:
-            logger.debug("_submit_review debug return")
+            logger.debug("_submit_review finish debug return")
             return
 
         self._pr.create_review(

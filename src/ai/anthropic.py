@@ -1,4 +1,12 @@
 import anthropic
+import logging
+
+
+logging.basicConfig(level=logging.DEBUG, 
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    handlers=[logging.FileHandler('review-me.log'), logging.StreamHandler()])
+
+logger = logging.getLogger(__name__)
 
 
 def chat_completion(
@@ -6,6 +14,7 @@ def chat_completion(
         prompt: str,
         model: str,
 ):
+    logger.debug("chat_completion start")
     client = anthropic.Anthropic()
 
     message = client.messages.create(
@@ -25,6 +34,7 @@ def chat_completion(
             }
         ],
     )
+    logger.debug("chat_completion finish")
     return message.content
 
 
@@ -35,6 +45,7 @@ def tool_completion(
         tools: list[dict],
         tool_override: str = "",
 ):
+    logger.debug("tool_completion start")
     client = anthropic.Anthropic()
 
     if tool_override == "any":
@@ -66,6 +77,8 @@ def tool_completion(
     if message.stop_reason == "tool_use":
         for response in message.content:
             if response.type == "tool_use":
+                logger.debug("tool_completion finish tool use")
                 return response.input
     else:
+        logger.debug("tool_completion finish else")
         return message.content[0].text
