@@ -1,4 +1,4 @@
-{% extends 'user/review-base.md' %}
+{% extends 'review-base.md' %}
 
 {% block content -%}
 Current Feedback:
