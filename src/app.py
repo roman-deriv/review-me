@@ -70,7 +70,7 @@ class App:
 
         tasks = []
         for i, req in enumerate(review_requests):
-            delay = i * 1.2  # Stagger start times by 1.5 seconds
+            delay = i * 1.5  # Stagger start times by 1.5 seconds
             task = asyncio.create_task(review_file(req, delay))
             tasks.append(task)
 
