@@ -71,24 +71,26 @@ class App:
         review_requests = self._assistant.files_to_review()
 
         comments: list[model.Comment] = []
-        print("We should review these files")
+        logger.info("Files being reviewed:")
         for req in review_requests:
-            print("Filename:", req.path)
-            print("Reason:", req.reason)
-            print()
+            logger.info("Filename:")
+            logger.info(req.path)
+            logger.info("Reason:")
+            logger.info(req.reason)
+            logger.info()
 
             file_comments = self._assistant.review_file(req.path)
             for comment in file_comments:
-                print(comment)
-                print("--------")
+                logger.info(comment)
+                logger.info("--------")
 
             comments += file_comments
 
         feedback = self._assistant.get_feedback(comments)
-        print()
-        print("OVERALL FEEDBACK")
-        print()
-        print(feedback)
+        logger.info()
+        logger.info("OVERALL FEEDBACK:")
+        logger.info()
+        logger.info(feedback)
         logger.debug("generate_feedback finish")
         return feedback
 
