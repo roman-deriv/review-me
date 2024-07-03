@@ -29,9 +29,13 @@ class Assistant:
 
     def review_file(self, filename: str) -> list[model.Comment]:
         system_prompt = prompt.load("file-review")
+
+        with open(filename, "r") as file:
+            source_code = file.readlines()
+
         results = tool_completion(
             system_prompt=system_prompt,
-            prompt=self._builder.file_diff(filename),
+            prompt=self._builder.file_diff(filename, source_code),
             model=self._model_name,
             tools=[
                 tool.post_feedback,
