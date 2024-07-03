@@ -77,7 +77,7 @@ class App:
             logger.info(req.path)
             logger.info("Reason:")
             logger.info(req.reason)
-            logger.info()
+            logger.info('')
 
             file_comments = self._assistant.review_file(req.path)
             for comment in file_comments:
@@ -87,9 +87,9 @@ class App:
             comments += file_comments
 
         feedback = self._assistant.get_feedback(comments)
-        logger.info()
+        logger.info('')
         logger.info("OVERALL FEEDBACK:")
-        logger.info()
+        logger.info('')
         logger.info(feedback)
         logger.debug("generate_feedback finish")
         return feedback
