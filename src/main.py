@@ -29,7 +29,7 @@ def main():
         asyncio.run(app.run())
     except Exception as e:
         logger.log.debug(f"Problem during run: {e}")
-        pr.create_issue_comment(f"{traceback.format_exc()}")
+        pr.create_issue_comment(f"Sorry, couldn't review your code becasue\n```{traceback.format_exc()}```")
         exit(42)
 
     
