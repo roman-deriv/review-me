@@ -68,9 +68,6 @@ class App:
 
         file_comments = await self._assistant.review_file(review_request)
 
-        for comment in file_comments:
-            logger.log.debug(f"File comment: {comment}")
-
         return file_comments
 
     async def _generate_feedback(self) -> model.Feedback:
