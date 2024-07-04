@@ -33,7 +33,8 @@ post_feedback = {
                    "feedback. This tool should be used to post detailed, "
                    "line-specific comments on code changes. Each feedback item "
                    "should correspond to a specific location in the code, identified "
-                   "by line number. Use this for constructive feedback, suggestions "
+                   "by line number. Each line number MUST belong to a hunk in the "
+                   "file diff. Use this for constructive feedback, suggestions "
                    "for improvement, or highlighting potential issues in the code. "
                    "Ensure comments are clear, specific, and actionable.",
     "input_schema": {
@@ -48,13 +49,6 @@ post_feedback = {
                             "type": "string",
                             "description": "The original file path"
                         },
-                        "end_line": {
-                            "type": "integer",
-                            "description": "The line number in the file to comment on. "
-                                           "Also the end line in multi-line comments "
-                                           "(inclusive). "
-                                           "MUST be *greater than* `start_line`."
-                        },
                         "start_line": {
                             "type": "integer",
                             "description": "Start line for multi-line comments "
@@ -63,11 +57,11 @@ post_feedback = {
                                            "The start line MUST be in the "
                                            "same hunk as the end line."
                         },
-                        "end_side": {
-                            "type": "string",
-                            "enum": ["LEFT", "RIGHT"],
-                            "description": "LEFT for original code, "
-                                           "RIGHT for modified code"
+                        "end_line": {
+                            "type": "integer",
+                            "description": "The end line in multi-line comments "
+                                           "(inclusive). "
+                                           "MUST be *greater than* `start_line`."
                         },
                         "start_side": {
                             "type": "string",
@@ -75,13 +69,19 @@ post_feedback = {
                             "description": "Side for the start line in multi-line "
                                            "comments"
                         },
+                        "end_side": {
+                            "type": "string",
+                            "enum": ["LEFT", "RIGHT"],
+                            "description": "LEFT for original code, "
+                                           "RIGHT for modified code"
+                        },
                         "body": {
                             "type": "string",
                             "description": "The actual feedback or comment on this "
                                            "section of code"
                         },
                     },
-                    "required": ["path", "end_line", "body"]
+                    "required": ["path", "start_line", "end_line", "body"]
                 }
             }
         },

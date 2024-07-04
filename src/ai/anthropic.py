@@ -2,15 +2,15 @@ import anthropic
 import logger
 
 
-def chat_completion(
+async def chat_completion(
         system_prompt: str,
         prompt: str,
         model: str,
 ):
     logger.log.debug(f"Starting chat completion using {model}")
-    client = anthropic.Anthropic()
+    client = anthropic.AsyncClient()
 
-    message = client.messages.create(
+    message = await client.messages.create(
         model=model,
         max_tokens=1000,
         temperature=0,
@@ -30,14 +30,14 @@ def chat_completion(
     return message.content
 
 
-def tool_completion(
+async def tool_completion(
         system_prompt: str,
         prompt: str,
         model: str,
         tools: list[dict],
         tool_override: str = "",
 ):
-    client = anthropic.Anthropic()
+    client = anthropic.AsyncClient()
 
     if tool_override == "any":
         tool_choice = {"type": "any"}
@@ -46,7 +46,7 @@ def tool_completion(
     else:
         tool_choice = {"type": "auto"}
 
-    message = client.messages.create(
+    message = await client.messages.create(
         model=model,
         max_tokens=1000,
         temperature=0,

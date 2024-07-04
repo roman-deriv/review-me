@@ -1,3 +1,5 @@
+import asyncio
+
 import github
 from github.PullRequest import PullRequest
 
@@ -55,21 +57,31 @@ class App:
         builder = ai.prompt.Builder(context)
         self._assistant = ai.assistant.Assistant(app_config.llm.model, builder)
 
-    def _generate_feedback(self) -> model.Feedback:
-        review_requests = self._assistant.files_to_review()
+    async def _generate_feedback(self) -> model.Feedback:
+        review_requests = await self._assistant.files_to_review()
 
-        comments: list[model.Comment] = []
-        for req in review_requests:
-
-            file_comments = self._assistant.review_file(req.path)
+        async def review_file(req, delay):
+            await asyncio.sleep(delay)
+            file_comments = await self._assistant.review_file(req.path)
             for comment in file_comments:
-                logger.log.debug(f"Filename: {req.path}")
-                logger.log.debug(f"Reason: {req.reason}")
-                logger.log.debug(f"Comment: {comment}")
+                print(comment)
+                print("--------")
+            return file_comments
 
-            comments += file_comments
+        tasks = []
+        for i, req in enumerate(review_requests):
+            delay = i * 1.5  # Stagger start times by 1.5 seconds
+            task = asyncio.create_task(review_file(req, delay))
+            tasks.append(task)
 
-        feedback = self._assistant.get_feedback(comments)
+        file_reviews = await asyncio.gather(*tasks)
+
+        # Flatten the list of comments
+        comments: list[model.Comment] = [
+            comment for file_comments in file_reviews for comment in file_comments
+        ]
+
+        feedback = await self._assistant.get_feedback(comments)
         logger.log.debug(f"Overall Feedback: {feedback}")
         return feedback
 
@@ -84,6 +96,6 @@ class App:
             event="COMMENT",
         )
 
-    def run(self):
-        feedback = self._generate_feedback()
+    async def run(self):
+        feedback = await self._generate_feedback()
         self._submit_review(feedback)
