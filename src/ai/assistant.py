@@ -48,6 +48,10 @@ class Assistant:
 
         comments = []
         for comment in results["feedback"]:
+            # skip any comment that isn't critical or an improvement
+            if comment.pop("severity").lower() in ["minor", "nitpick"]:
+                continue
+
             # override path for determinism
             comment.update(path=file.path)
             if "end_line" in comment:

@@ -99,8 +99,8 @@ class App:
             return
 
         self._pr.create_review(
-            body=f"{feedback.summary}\n"
-                 f"{feedback.overall_comment}\n"
+            body=f"{feedback.summary}\n\n"
+                 f"{feedback.overall_comment}\n\n"
                  f"{feedback.evaluation}",
             comments=feedback.comments,
             event="COMMENT",
