@@ -1,12 +1,15 @@
-import model, logger
-from . import prompt, tool
+import logger
+import model
+from . import prompt
 from .anthropic import tool_completion
+from .tool import get_all_tools
 
 
 class Assistant:
     def __init__(self, model_name: str, builder: prompt.Builder):
         self._model_name = model_name
         self._builder = builder
+        self._tools = get_all_tools()
 
     async def files_to_review(self) -> list[model.FileReviewRequest]:
         system_prompt = prompt.load("overview")
@@ -14,9 +17,7 @@ class Assistant:
             system_prompt=system_prompt,
             prompt=self._builder.overview(),
             model=self._model_name,
-            tools=[
-                tool.review_files,
-            ],
+            tools=[self._tools["review_files"]],
             tool_override="review_files",
         )
         files = [
@@ -39,9 +40,7 @@ class Assistant:
             system_prompt=system_prompt,
             prompt=self._builder.file_diff(filename, source_code),
             model=self._model_name,
-            tools=[
-                tool.post_feedback,
-            ],
+            tools=[self._tools["post_feedback"]],
             tool_override="post_feedback",
         )
 
@@ -73,9 +72,7 @@ class Assistant:
             system_prompt=system_prompt,
             prompt=self._builder.review_summary(comments),
             model=self._model_name,
-            tools=[
-                tool.submit_review,
-            ],
+            tools=[self._tools["submit_review"]],
             tool_override="submit_review",
         )
         feedback = model.Feedback(
