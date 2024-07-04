@@ -17,16 +17,16 @@
                             "type": "string",
                             "description": "A brief description of what changed in this file"
                         },
-                        "additional_context": {
+                        "related_changes": {
                             "type": "string",
-                            "description": "Related changes or other useful context for reviewing this file"
+                            "description": "Related changes from other files or other useful context for reviewing this file"
                         },
                         "reason": {
                             "type": "string",
                             "description": "The reason or rationale for the review"
                         }
                     },
-                    "required": ["filename", "changes", "additional_context", "reason"]
+                    "required": ["filename", "changes", "related_changes", "reason"]
                 }
             }
         },
