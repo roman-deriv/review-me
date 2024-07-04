@@ -1,4 +1,5 @@
 import anthropic
+import logger
 
 
 def chat_completion(
@@ -6,6 +7,7 @@ def chat_completion(
         prompt: str,
         model: str,
 ):
+    logger.log.debug(f"Starting chat completion using {model}")
     client = anthropic.Anthropic()
 
     message = client.messages.create(
@@ -66,6 +68,8 @@ def tool_completion(
     if message.stop_reason == "tool_use":
         for response in message.content:
             if response.type == "tool_use":
+                logger.log.debug(f"Tool completion finished with {response.input}")
                 return response.input
     else:
+        logger.log.debug(f"Tool completion finished without tool use: {message.content[0].text}")
         return message.content[0].text

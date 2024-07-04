@@ -1,4 +1,4 @@
-import model
+import model, logger
 from . import prompt, tool
 from .anthropic import tool_completion
 
@@ -19,13 +19,15 @@ class Assistant:
             ],
             tool_override="review_files",
         )
-        return [
+        files = [
             model.FileReviewRequest(
                 path=req["filename"],
                 reason=req["reason"],
             )
             for req in results["files"]
         ]
+        logger.log.debug(f"Files to review: {files}")
+        return files
 
     def review_file(self, filename: str) -> list[model.Comment]:
         system_prompt = prompt.load("file-review")
@@ -72,8 +74,9 @@ class Assistant:
             ],
             tool_override="submit_review",
         )
-        return model.Feedback(
+        feedback = model.Feedback(
             comments=comments,
             overall_comment=response["feedback"],
             evaluation=response["event"],
         )
+        return feedback

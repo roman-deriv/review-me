@@ -1,6 +1,7 @@
 import json
 import os
 
+
 from model import AppConfig, GitHubConfig, LlmConfig
 
 
@@ -19,7 +20,7 @@ def from_env() -> AppConfig:
 
     pr_number = event["issue"]["number"]
 
-    return AppConfig(
+    config = AppConfig(
         github=GitHubConfig(
             token=github_token,
             repository=repository,
@@ -31,3 +32,5 @@ def from_env() -> AppConfig:
         ),
         debug=debug,
     )
+
+    return config

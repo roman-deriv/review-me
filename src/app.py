@@ -6,17 +6,20 @@ import ai.prompt
 import ai.tool
 import config
 import model
+import logger
 
 
 def get_pr(cfg: config.GitHubConfig):
     gh = github.Github(cfg.token)
     repo = gh.get_repo(cfg.repository)
-    return repo.get_pull(cfg.pr_number)
+    pr = repo.get_pull(cfg.pr_number)
+    logger.log.debug(f"Pull request retrieved: {pr.number}")
+    return pr
 
 
 def build_context(pull_request: PullRequest) -> model.ReviewContext:
     files = pull_request.get_files()
-    return model.ReviewContext(
+    context = model.ReviewContext(
         title=pull_request.title,
         description=pull_request.body,
         commit_messages=[
@@ -39,6 +42,8 @@ def build_context(pull_request: PullRequest) -> model.ReviewContext:
         modified_files=[file.filename for file in files if file.status == 'modified'],
         deleted_files=[file.filename for file in files if file.status == 'removed']
     )
+    logger.log.debug(f"Context built sucessfully: {context.title}")
+    return context
 
 
 class App:
@@ -54,30 +59,25 @@ class App:
         review_requests = self._assistant.files_to_review()
 
         comments: list[model.Comment] = []
-        print("We should review these files")
         for req in review_requests:
-            print("Filename:", req.path)
-            print("Reason:", req.reason)
-            print()
 
             file_comments = self._assistant.review_file(req.path)
             for comment in file_comments:
-                print(comment)
-                print("--------")
+                logger.log.debug(f"Filename: {req.path}")
+                logger.log.debug(f"Reason: {req.reason}")
+                logger.log.debug(f"Comment: {comment}")
 
             comments += file_comments
 
         feedback = self._assistant.get_feedback(comments)
-        print()
-        print("OVERALL FEEDBACK")
-        print()
-        print(feedback)
+        logger.log.debug(f"Overall Feedback: {feedback}")
         return feedback
 
     def _submit_review(self, feedback: model.Feedback):
         if self._config.debug:
+            logger.log.debug("Running in debug, no review submitted")
             return
-
+        
         self._pr.create_review(
             body=feedback.overall_comment,
             comments=feedback.comments,
