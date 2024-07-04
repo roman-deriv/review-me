@@ -4,11 +4,10 @@ import github
 from github.PullRequest import PullRequest
 
 import ai.assistant
-import ai.prompt
 import ai.tool
 import config
-import model
 import logger
+import model
 
 
 def get_pr(cfg: config.GitHubConfig):
@@ -49,13 +48,15 @@ def build_context(pull_request: PullRequest) -> model.ReviewContext:
 
 
 class App:
-    def __init__(self, app_config: config.AppConfig):
-        self._config = app_config
-        self._pr = get_pr(self._config.github)
-
-        context = build_context(self._pr)
-        builder = ai.prompt.Builder(context)
-        self._assistant = ai.assistant.Assistant(app_config.llm.model, builder)
+    def __init__(
+            self,
+            pull_request: PullRequest,
+            assistant: ai.assistant.Assistant,
+            debug: bool = False,
+    ):
+        self._pr = pull_request
+        self._assistant = assistant
+        self._debug = debug
 
     async def _generate_feedback(self) -> model.Feedback:
         review_requests = await self._assistant.files_to_review()
@@ -86,10 +87,10 @@ class App:
         return feedback
 
     def _submit_review(self, feedback: model.Feedback):
-        if self._config.debug:
+        if self._debug:
             logger.log.debug("Running in debug, no review submitted")
             return
-        
+
         self._pr.create_review(
             body=feedback.overall_comment,
             comments=feedback.comments,
