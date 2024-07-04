@@ -9,9 +9,9 @@ from .tool import get_all_tools
 
 class Severity(IntEnum):
     CRITICAL = 0
-    IMPORTANT = 1
-    MINOR = 2
-    NITPICK = 3
+    MAJOR = 1
+    OPTIONAL = 2
+    MINOR = 3
     NO_CHANGE = 4
 
     @classmethod
@@ -49,7 +49,7 @@ class Assistant:
     async def review_file(
             self,
             file: model.FileReviewRequest,
-            severity_limit: int = Severity.IMPORTANT,
+            severity_limit: int = Severity.OPTIONAL,
     ) -> list[model.Comment]:
         system_prompt = prompt.load("file-review")
 
@@ -66,7 +66,6 @@ class Assistant:
 
         comments = []
         for comment in results["feedback"]:
-            # skip any comment that isn't critical or an improvement
             severity = Severity.from_string(comment.pop("severity"))
             if severity > severity_limit:
                 logger.log.debug(f"Skipping {severity} comment: {comment}")

@@ -45,12 +45,12 @@
               "type": "string",
               "enum": [
                 "CRITICAL",
-                "IMPORTANT",
+                "MAJOR",
+                "OPTIONAL",
                 "MINOR",
-                "NITPICK",
                 "NO_CHANGE"
               ],
-              "description": "Critical items must be addressed. Important items are strongly recommended. Minor comments are optional. Nitpicks are personal preferences. No change means general feedback with no action needed."
+              "description": "CRITICAL items must be addressed. MAJOR items are strongly recommended. OPTIONAL comments are suggestions. MINOR items are personal preferences. NO CHANGE means general feedback with no action needed."
             }
           },
           "required": [

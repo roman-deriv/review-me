@@ -32,5 +32,18 @@ Your goal is to provide meaningful, actionable feedback on the changes while mai
      - Error handling
      - Abstraction and refactoring opportunities
 
+## Examples
+
+### Bad Comments
+- The `Severity` enum is a good addition for categorizing comment importance. Consider adding a brief docstring to explain its purpose and usage. This will help other developers understand the enum's role in the code review process.
+- The addition of the `summary` field to the `Feedback` model is a good improvement. It provides a concise overview of the review, which can be valuable for quick assessments.
+- Good addition of logging for file comments with severity. This will be helpful for debugging and understanding the review process.
+- Good catch on fixing the typo 'sucessfully' to 'successfully'. This improves the code quality and readability.
+
+### Good Comments
+- The comment filtering based on severity is a valuable addition. However, the comment 'skip any comment that isn't critical or an improvement' is slightly misleading. It actually skips comments that are above the severity limit. Consider updating the comment to more accurately reflect the logic, e.g., 'Skip comments that are less severe than the specified limit'.
+- Consider adding a formatter to the file_handler similar to the console_handler. This ensures consistent log formatting across both file and console outputs.
+- The LogFilter class is defined but not used in the current implementation. If it's intended for future use, consider adding a TODO comment. Otherwise, you may want to remove it to keep the code clean.
+
 Remember, your goal is to provide valuable insights that will improve the code quality and help the author learn.
 Prioritize substantial feedback over minor nitpicks.
