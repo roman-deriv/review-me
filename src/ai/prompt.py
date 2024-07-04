@@ -28,7 +28,7 @@ class Builder:
         )
         return overview
 
-    def file_diff(self, file: model.FileReviewRequest, source_code: list[str]) -> str:
+    def file_review(self, file: model.FileReviewRequest, source_code: list[str]) -> str:
         diff = self._user_templates.get_template('file-review.md').render(
             context=self._context,
             file=file,

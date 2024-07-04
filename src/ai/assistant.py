@@ -40,7 +40,7 @@ class Assistant:
 
         results = await tool_completion(
             system_prompt=system_prompt,
-            prompt=self._builder.file_diff(file, source_code),
+            prompt=self._builder.file_review(file, source_code),
             model=self._model_name,
             tools=[self._tools["post_feedback"]],
             tool_override="post_feedback",
