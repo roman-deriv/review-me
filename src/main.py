@@ -12,8 +12,6 @@ import logger
 
 
 def main():
-
-
     try:
         cfg = config.from_env()
         pr = get_pr(cfg.github)
@@ -41,7 +39,5 @@ def main():
             sys.exit(69)
 
     
-
-
 if __name__ == "__main__":
     main()
