@@ -14,7 +14,7 @@ def get_pr(cfg: config.GitHubConfig):
     gh = github.Github(cfg.token)
     repo = gh.get_repo(cfg.repository)
     pr = repo.get_pull(cfg.pr_number)
-    logger.log.debug(f"Pull request retrieved: {pr.number}")
+    logger.log.debug(f"Pull request retrieved: #{pr.number}")
     return pr
 
 
@@ -68,9 +68,8 @@ class App:
 
         file_comments = await self._assistant.review_file(review_request)
 
-        logger.log.debug(f"File comments:")
         for comment in file_comments:
-            logger.log.debug(comment)
+            logger.log.debug(f"File comment: {comment}")
 
         return file_comments
 
