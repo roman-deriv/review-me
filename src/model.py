@@ -49,6 +49,7 @@ class ReviewContext:
 
 @dataclasses.dataclass
 class Feedback:
+    summary: str
     comments: list[Comment]
     overall_comment: CommentBody
     evaluation: str

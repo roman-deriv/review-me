@@ -43,7 +43,7 @@ def build_context(pull_request: PullRequest) -> model.ReviewContext:
         modified_files=[file.filename for file in files if file.status == 'modified'],
         deleted_files=[file.filename for file in files if file.status == 'removed']
     )
-    logger.log.debug(f"Context built sucessfully: {context.title}")
+    logger.log.debug(f"Context built successfully: {context.title}")
     return context
 
 
@@ -90,7 +90,7 @@ class App:
         ]
 
         feedback = await self._assistant.get_feedback(comments)
-        logger.log.debug(f"Overall Feedback: {feedback}")
+        logger.log.info(f"Overall Feedback: {feedback.evaluation}")
         return feedback
 
     def _submit_review(self, feedback: model.Feedback):
@@ -99,7 +99,9 @@ class App:
             return
 
         self._pr.create_review(
-            body=feedback.overall_comment,
+            body=f"{feedback.summary}\n"
+                 f"{feedback.overall_comment}\n"
+                 f"{feedback.evaluation}",
             comments=feedback.comments,
             event="COMMENT",
         )

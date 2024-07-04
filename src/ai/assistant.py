@@ -81,6 +81,7 @@ class Assistant:
         )
         feedback = model.Feedback(
             comments=comments,
+            summary=response["summary"],
             overall_comment=response["feedback"],
             evaluation=response["event"],
         )
