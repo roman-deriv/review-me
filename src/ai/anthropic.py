@@ -1,5 +1,5 @@
 import anthropic
-import logs
+import logger
 
 
 def chat_completion(
@@ -7,7 +7,7 @@ def chat_completion(
         prompt: str,
         model: str,
 ):
-    logs.debug(f"Starting chat completion using {model}")
+    logger.log.debug(f"Starting chat completion using {model}")
     client = anthropic.Anthropic()
 
     message = client.messages.create(
@@ -27,7 +27,6 @@ def chat_completion(
             }
         ],
     )
-    logs.debug("Finished chat completion")
     return message.content
 
 
@@ -38,7 +37,6 @@ def tool_completion(
         tools: list[dict],
         tool_override: str = "",
 ):
-    logs.debug("Starting tool completion")
     client = anthropic.Anthropic()
 
     if tool_override == "any":
@@ -70,8 +68,8 @@ def tool_completion(
     if message.stop_reason == "tool_use":
         for response in message.content:
             if response.type == "tool_use":
-                logs.debug(f"Tool completion finished with {response.input}")
+                logger.log.debug(f"Tool completion finished with {response.input}")
                 return response.input
     else:
-        logs.debug(f"Tool completion finished without tool use: {message.content[0].text}")
+        logger.log.debug(f"Tool completion finished without tool use: {message.content[0].text}")
         return message.content[0].text

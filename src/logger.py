@@ -6,19 +6,4 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     handlers=[logging.FileHandler(os.environ.get("LOGFILE","default_logfile.log")), logging.StreamHandler()])
 
-logger = logging.getLogger(__name__)
-
-def debug(message):
-    logger.debug(message)
-
-def info(message):
-    logger.info(message)
-
-def warning(message):
-    logger.warning(message)
-
-def error(message):
-    logger.error(message)
-
-def critical(message):
-    logger.critical(message)
+log = logging.getLogger(__name__)

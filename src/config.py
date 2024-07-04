@@ -2,12 +2,10 @@ import json
 import os
 
 
-import logs
 from model import AppConfig, GitHubConfig, LlmConfig
 
 
 def from_env() -> AppConfig:
-    logs.debug("Environment configuration started")
     debug = bool(os.environ.get("DEBUG", False))
 
     github_token = os.environ.get("GITHUB_TOKEN")
@@ -35,5 +33,4 @@ def from_env() -> AppConfig:
         debug=debug,
     )
 
-    logs.debug("Environment configuration loaded successfully")
     return config

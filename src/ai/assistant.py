@@ -1,18 +1,14 @@
-import model
-import logs
+import model, logger
 from . import prompt, tool
 from .anthropic import tool_completion
 
 
 class Assistant:
     def __init__(self, model_name: str, builder: prompt.Builder):
-        logs.debug("Starting to create assistant")
         self._model_name = model_name
         self._builder = builder
-        logs.debug("Finished creating assistant")
 
     def files_to_review(self) -> list[model.FileReviewRequest]:
-        logs.debug("Starting review of files")
         system_prompt = prompt.load("overview")
         results = tool_completion(
             system_prompt=system_prompt,
@@ -30,11 +26,10 @@ class Assistant:
             )
             for req in results["files"]
         ]
-        logs.debug("Finished review of files")
+        logger.log.debug(f"Files to review: {files}")
         return files
 
     def review_file(self, filename: str) -> list[model.Comment]:
-        logs.debug(f"Starting review of file {filename}")
         system_prompt = prompt.load("file-review")
 
         with open(filename, "r") as file:
@@ -63,14 +58,12 @@ class Assistant:
 
             comments.append(comment)
 
-        logs.debug(f"Finished review of {filename}")
         return comments
 
     def get_feedback(
             self,
             comments: list[model.Comment],
     ) -> model.Feedback:
-        logs.debug("Starting to get feedback")
         system_prompt = prompt.load("review-summary")
         response = tool_completion(
             system_prompt=system_prompt,
@@ -86,5 +79,4 @@ class Assistant:
             overall_comment=response["feedback"],
             evaluation=response["event"],
         )
-        logs.debug("Finished getting feedback")
         return feedback
