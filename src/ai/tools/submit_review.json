@@ -1,19 +1,31 @@
 {
-    "name": "submit_review",
-    "description": "Provide a final evaluation for the GitHub pull request. This tool should be used after generating individual comments to create an overall summary and determine the final review action (approve, comment, or request changes).",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "feedback": {
-                "type": "string",
-                "description": "Final thoughts and overall feedback on the Pull Request"
-            },
-            "event": {
-                "type": "string",
-                "enum": ["APPROVE", "COMMENT", "REQUEST_CHANGES"],
-                "description": "The final review action to take"
-            }
-        },
-        "required": ["feedback", "event"]
-    }
+  "name": "submit_review",
+  "description": "Submit the final evaluation for a GitHub pull request. Use this tool to provide an overall summary and determine the final review action after analyzing individual comments.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "summary": {
+        "type": "string",
+        "description": "Comprehensive summary of the review, including key findings, patterns, and recommendations"
+      },
+      "feedback": {
+        "type": "string",
+        "description": "Constructive feedback and specific suggestions for improvement"
+      },
+      "event": {
+        "type": "string",
+        "enum": [
+          "APPROVE",
+          "COMMENT",
+          "REQUEST_CHANGES"
+        ],
+        "description": "The final review action to take"
+      }
+    },
+    "required": [
+      "summary",
+      "feedback",
+      "event"
+    ]
+  }
 }

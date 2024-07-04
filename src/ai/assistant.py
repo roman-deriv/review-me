@@ -1,8 +1,22 @@
+from enum import IntEnum
+
 import logger
 import model
 from . import prompt
 from .anthropic import tool_completion
 from .tool import get_all_tools
+
+
+class Severity(IntEnum):
+    CRITICAL = 0
+    MAJOR = 1
+    OPTIONAL = 2
+    MINOR = 3
+    NO_CHANGE = 4
+
+    @classmethod
+    def from_string(cls, s):
+        return cls[s.upper()]
 
 
 class Assistant:
@@ -32,7 +46,11 @@ class Assistant:
         logger.log.debug(f"Files to review: {files}")
         return files
 
-    async def review_file(self, file: model.FileReviewRequest) -> list[model.Comment]:
+    async def review_file(
+            self,
+            file: model.FileReviewRequest,
+            severity_limit: int = Severity.OPTIONAL,
+    ) -> list[model.Comment]:
         system_prompt = prompt.load("file-review")
 
         with open(file.path, "r") as source_file:
@@ -48,6 +66,11 @@ class Assistant:
 
         comments = []
         for comment in results["feedback"]:
+            severity = Severity.from_string(comment.pop("severity"))
+            if severity > severity_limit:
+                logger.log.debug(f"Skipping {severity} comment: {comment}")
+                continue
+
             # override path for determinism
             comment.update(path=file.path)
             if "end_line" in comment:
@@ -61,6 +84,7 @@ class Assistant:
                 # replace `end_side` with `side`
                 comment.update(side=comment.pop("end_side"))
 
+            logger.log.debug(f"File comment ({severity}): {comment}")
             comments.append(comment)
 
         logger.log.debug(f"Finished file review for `{file.path}`")
@@ -81,6 +105,7 @@ class Assistant:
         )
         feedback = model.Feedback(
             comments=comments,
+            summary=response["summary"],
             overall_comment=response["feedback"],
             evaluation=response["event"],
         )

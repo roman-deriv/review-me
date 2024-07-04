@@ -1,45 +1,70 @@
 {
-    "name": "post_feedback",
-    "description": "Create GitHub pull request review comments from the provided feedback. This tool should be used to post detailed, line-specific comments on code changes. Each feedback item should correspond to a specific location in the code, identified by line number. Each line number MUST belong to a hunk in the file diff. Use this for constructive feedback, suggestions for improvement, or highlighting potential issues in the code. Ensure comments are clear, specific, and actionable.",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "feedback": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "path": {
-                            "type": "string",
-                            "description": "The original file path"
-                        },
-                        "start_line": {
-                            "type": "integer",
-                            "description": "Start line for multi-line comments (inclusive). MUST be *less than* `end_line`. The start line MUST be in the same hunk as the end line."
-                        },
-                        "end_line": {
-                            "type": "integer",
-                            "description": "The end line in multi-line comments (inclusive). MUST be *greater than* `start_line`."
-                        },
-                        "start_side": {
-                            "type": "string",
-                            "enum": ["LEFT", "RIGHT"],
-                            "description": "Side for the start line in multi-line comments"
-                        },
-                        "end_side": {
-                            "type": "string",
-                            "enum": ["LEFT", "RIGHT"],
-                            "description": "LEFT for original code, RIGHT for modified code"
-                        },
-                        "body": {
-                            "type": "string",
-                            "description": "The actual feedback or comment on this section of code"
-                        }
-                    },
-                    "required": ["path", "start_line", "end_line", "body"]
-                }
+  "name": "post_feedback",
+  "description": "Create GitHub pull request review comments from the provided feedback. This tool should be used to post detailed, line-specific comments on code changes. Each feedback item should correspond to a specific location in the code, identified by line number. Each line number MUST belong to a hunk in the file diff. Use this for constructive feedback, suggestions for improvement, or highlighting potential issues in the code. Ensure comments are clear, specific, and actionable.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "feedback": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "The original file path"
+            },
+            "start_line": {
+              "type": "integer",
+              "description": "Start line for multi-line comments (inclusive). MUST be *less than* `end_line`. The start line MUST be in the same hunk as the end line."
+            },
+            "end_line": {
+              "type": "integer",
+              "description": "The end line in multi-line comments (inclusive). MUST be *greater than* `start_line`."
+            },
+            "start_side": {
+              "type": "string",
+              "enum": [
+                "LEFT",
+                "RIGHT"
+              ],
+              "description": "Side for the start line in multi-line comments"
+            },
+            "end_side": {
+              "type": "string",
+              "enum": [
+                "LEFT",
+                "RIGHT"
+              ],
+              "description": "LEFT for original code, RIGHT for modified code"
+            },
+            "body": {
+              "type": "string",
+              "description": "The actual feedback or comment on this section of code"
+            },
+            "severity": {
+              "type": "string",
+              "enum": [
+                "CRITICAL",
+                "MAJOR",
+                "OPTIONAL",
+                "MINOR",
+                "NO_CHANGE"
+              ],
+              "description": "CRITICAL items must be addressed. MAJOR items are strongly recommended. OPTIONAL comments are suggestions. MINOR items are personal preferences. NO CHANGE means general feedback with no action needed."
             }
-        },
-        "required": ["feedback"]
-    }
+          },
+          "required": [
+            "path",
+            "start_line",
+            "end_line",
+            "body",
+            "severity"
+          ]
+        }
+      }
+    },
+    "required": [
+      "feedback"
+    ]
+  }
 }

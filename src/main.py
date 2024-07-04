@@ -19,9 +19,9 @@ def main():
         logger.log.critical(f"Couldn't retrieve pull request from Github: {e}")
         sys.exit(69)
     except Exception as e:
-        logger.log.critical(f"Problem during inital setup: {e}")
+        logger.log.critical(f"Problem during initial setup: {e}")
         sys.exit(42)
-    
+
     try:
         context = build_context(pr)
         builder = ai.prompt.Builder(context)
@@ -33,11 +33,14 @@ def main():
     except Exception as e:
         logger.log.error(f"Problem during run: {e}")
         try:
-            pr.create_issue_comment(f"Sorry, couldn't review your code becasue\n```{traceback.format_exc()}```")
+            pr.create_issue_comment(
+                f"Sorry, couldn't review your code because\n"
+                f"```{traceback.format_exc()}```"
+            )
         except github.GithubException as e2:
             logger.log.error(f"Problem posting error comment: {e2}")
             sys.exit(69)
 
-    
+
 if __name__ == "__main__":
     main()
