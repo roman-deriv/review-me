@@ -1,35 +1,42 @@
 {
-    "name": "review_files",
-    "description": "Review a list of files more carefully. It should be used whenever the user needs a PR review.",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "files": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "filename": {
-                            "type": "string",
-                            "description": "Name of the file to review"
-                        },
-                        "changes": {
-                            "type": "string",
-                            "description": "A brief description of what changed in this file"
-                        },
-                        "related_changes": {
-                            "type": "string",
-                            "description": "Related changes from other files or other useful context for reviewing this file"
-                        },
-                        "reason": {
-                            "type": "string",
-                            "description": "The reason or rationale for the review"
-                        }
-                    },
-                    "required": ["filename", "changes", "related_changes", "reason"]
-                }
+  "name": "review_files",
+  "description": "Submit a list of files for detailed code review within a Pull Request. This tool should be used to flag files that require careful examination due to critical changes, potential issues, or significant impact on the codebase.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "files": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "filename": {
+              "type": "string",
+              "description": "Full path and name of the file to review"
+            },
+            "changes": {
+              "type": "string",
+              "description": "Concise summary of the changes made to this file in the PR"
+            },
+            "related_changes": {
+              "type": "string",
+              "description": "Brief description of related changes in other files or relevant context that impacts the review of this file"
+            },
+            "reason": {
+              "type": "string",
+              "description": "Specific rationale for why this file needs careful review, highlighting potential concerns or areas of focus"
             }
-        },
-        "required": ["files"]
-    }
+          },
+          "required": [
+            "filename",
+            "changes",
+            "related_changes",
+            "reason"
+          ]
+        }
+      }
+    },
+    "required": [
+      "files"
+    ]
+  }
 }
