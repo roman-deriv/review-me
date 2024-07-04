@@ -5,8 +5,8 @@ LOG_FILE = os.environ.get("LOGFILE", "default_logfile.log")
 
 
 def _init_logger():
-    log = logging.getLogger(__name__)
-    log.setLevel(logging.DEBUG)
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
 
     file_handler = logging.FileHandler(LOG_FILE)
     file_handler.setLevel(logging.INFO)
@@ -19,15 +19,10 @@ def _init_logger():
     )
     console_handler.setFormatter(formatter)
 
-    log.addHandler(file_handler)
-    log.addHandler(console_handler)
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
 
-    return log
-
-
-class LogFilter(logging.Filter):
-    def filter(self, record):
-        return record.name.startswith(__name__)
+    return logger
 
 
 log = _init_logger()
