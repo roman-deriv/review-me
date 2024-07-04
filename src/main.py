@@ -4,11 +4,11 @@ from app import App
 
 
 def main():
-    logs.info("main start")
+    logs.info("Main is starting")
     cfg = config.from_env()
     app = App(cfg)
     app.run()
-    logs.info("main finish")
+    logs.info("Main finished successfully")
 
 
 if __name__ == "__main__":
