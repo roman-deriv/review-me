@@ -85,7 +85,10 @@ class App:
         if self._config.debug:
             logs.debug("Running in debug, no review submitted")
             return
-
+        
+        logs.info(f"Overall Comment: {feedback.overall_comment}")
+        for comment in feedback.comments:
+            logs.info(f"Comment: {comment}")
         self._pr.create_review(
             body=feedback.overall_comment,
             comments=feedback.comments,
