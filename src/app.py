@@ -60,7 +60,7 @@ class App:
         logs.debug("Successfully created App")
 
     def _generate_feedback(self) -> model.Feedback:
-        logs.debug("Starting to generating feedback")
+        logs.debug("Starting to generate feedback")
         review_requests = self._assistant.files_to_review()
 
         comments: list[model.Comment] = []
@@ -69,7 +69,9 @@ class App:
 
             file_comments = self._assistant.review_file(req.path)
             for comment in file_comments:
-                logs.info(f"Filename: {req.path}\nReason: {req.reason}\nComment: {comment}")
+                logs.info(f"Filename: {req.path}")
+                logs.info(f"Reason: {req.reason}")
+                logs.info(f"Comment: {comment}")
 
             comments += file_comments
 

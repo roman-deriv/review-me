@@ -4,9 +4,9 @@ import os
 
 logging.basicConfig(level=logging.DEBUG, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    handlers=[logging.FileHandler(os.environ.get("LOGFILE","default.log")), logging.StreamHandler()])
+                    handlers=[logging.FileHandler(os.environ.get("LOGFILE","default_logfile.log")), logging.StreamHandler()])
 
-logger = logging.getLogger('review-me-logger')
+logger = logging.getLogger(__name__)
 
 def debug(message):
     logger.debug(message)
