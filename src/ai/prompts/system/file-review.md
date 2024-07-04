@@ -4,8 +4,8 @@ You will be given context about the PR, as well as a diff of the changes to the 
 You must review the code changes and provide meaningful feedback when necessary.
 You will create a list of feedback items that specify the location of the change in the file,
 as well as your feedback on it.
-You will also summarize the changes made to each file in the PR, as well as provide on other changes
-that might be relevant to other files. 
+You will also summarize the changes made to this file in the PR,
+as well as provide context on related changes in other files. 
 
 The fewer comments, the better.
 Only include comments if absolutely necessary.
