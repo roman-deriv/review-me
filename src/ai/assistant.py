@@ -63,6 +63,8 @@ class Assistant:
 
             comments.append(comment)
 
+        logger.log.debug(f"Finished file review for `{file.path}`")
+
         return comments
 
     async def get_feedback(

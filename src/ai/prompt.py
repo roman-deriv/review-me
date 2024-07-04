@@ -3,7 +3,6 @@ import pathlib
 import jinja2
 
 import model
-import logger
 
 
 PROMPT_DIR = pathlib.Path(__file__).parent / "prompts"
@@ -27,22 +26,19 @@ class Builder:
         overview = self._user_templates.get_template('overview.md').render(
             context=self._context,
         )
-        logger.log.debug(f"Finished creating overview: {overview}")
         return overview
 
     def file_diff(self, file: model.FileReviewRequest, source_code: list[str]) -> str:
-        fdiff = self._user_templates.get_template('file-review.md').render(
+        diff = self._user_templates.get_template('file-review.md').render(
             context=self._context,
             file=file,
             source_code=source_code,
         )
-        logger.log.debug(f"Finished creating file diff: {fdiff}")
-        return fdiff
+        return diff
 
     def review_summary(self, comments: list[model.Comment]) -> str:
         summary = self._user_templates.get_template('review-summary.md').render(
             context=self._context,
             comments=comments,
         )
-        logger.log.debug(f"Finished creating review summary: {summary}")
         return summary
