@@ -4,7 +4,7 @@ import os
 
 logging.basicConfig(level=logging.DEBUG, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    handlers=[logging.FileHandler(os.environ.get("LOGFILE")), logging.StreamHandler()])
+                    handlers=[logging.FileHandler(os.environ.get("LOGFILE","default.log")), logging.StreamHandler()])
 
 logger = logging.getLogger('review-me-logger')
 
