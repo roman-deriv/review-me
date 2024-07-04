@@ -78,7 +78,7 @@ class App:
         review_requests = await self._assistant.files_to_review()
 
         tasks = [
-            asyncio.create_task(self._review_file(req, delay=i * 2))
+            asyncio.create_task(self._review_file(req, delay=i * 2.5))
             for i, req in enumerate(review_requests)
         ]
 
