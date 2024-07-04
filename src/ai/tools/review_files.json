@@ -13,12 +13,20 @@
                             "type": "string",
                             "description": "Name of the file to review"
                         },
+                        "changes": {
+                            "type": "string",
+                            "description": "A brief description of what changed in this file"
+                        },
+                        "related_changes": {
+                            "type": "string",
+                            "description": "Related changes from other files or other useful context for reviewing this file"
+                        },
                         "reason": {
                             "type": "string",
                             "description": "The reason or rationale for the review"
                         }
                     },
-                    "required": ["filename", "reason"]
+                    "required": ["filename", "changes", "related_changes", "reason"]
                 }
             }
         },

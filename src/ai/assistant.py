@@ -23,6 +23,8 @@ class Assistant:
         files = [
             model.FileReviewRequest(
                 path=req["filename"],
+                changes=req["changes"],
+                related_changed=req["related_changes"],
                 reason=req["reason"],
             )
             for req in results["files"]
@@ -30,15 +32,15 @@ class Assistant:
         logger.log.debug(f"Files to review: {files}")
         return files
 
-    async def review_file(self, filename: str) -> list[model.Comment]:
+    async def review_file(self, file: model.FileReviewRequest) -> list[model.Comment]:
         system_prompt = prompt.load("file-review")
 
-        with open(filename, "r") as file:
-            source_code = file.readlines()
+        with open(file.path, "r") as source_file:
+            source_code = source_file.readlines()
 
         results = await tool_completion(
             system_prompt=system_prompt,
-            prompt=self._builder.file_diff(filename, source_code),
+            prompt=self._builder.file_review(file, source_code),
             model=self._model_name,
             tools=[self._tools["post_feedback"]],
             tool_override="post_feedback",
@@ -47,7 +49,7 @@ class Assistant:
         comments = []
         for comment in results["feedback"]:
             # override path for determinism
-            comment.update(path=filename)
+            comment.update(path=file.path)
             if "end_line" in comment:
                 if "start_line" in comment:
                     if int(comment["start_line"]) >= int(comment["end_line"]):
@@ -60,6 +62,8 @@ class Assistant:
                 comment.update(side=comment.pop("end_side"))
 
             comments.append(comment)
+
+        logger.log.debug(f"Finished file review for `{file.path}`")
 
         return comments
 

@@ -30,6 +30,8 @@ class AppConfig:
 @dataclasses.dataclass
 class FileReviewRequest:
     path: str
+    changes: str
+    related_changed: str
     reason: str
 
 @dataclasses.dataclass
