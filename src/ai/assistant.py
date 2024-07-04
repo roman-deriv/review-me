@@ -24,7 +24,7 @@ class Assistant:
             model.FileReviewRequest(
                 path=req["filename"],
                 changes=req["changes"],
-                additional_context=req["additional_context"],
+                related_changed=req["additional_context"],
                 reason=req["reason"],
             )
             for req in results["files"]
