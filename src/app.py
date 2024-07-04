@@ -58,28 +58,36 @@ class App:
         self._assistant = assistant
         self._debug = debug
 
+    async def _review_file(
+            self,
+            review_request: model.FileReviewRequest,
+            delay: float,
+    ) -> list[model.Comment]:
+        # Stagger request start times to comply with rate limits
+        await asyncio.sleep(delay)
+
+        file_comments = await self._assistant.review_file(review_request)
+
+        logger.log.debug(f"File comments:")
+        for comment in file_comments:
+            logger.log.debug(comment)
+
+        return file_comments
+
     async def _generate_feedback(self) -> model.Feedback:
         review_requests = await self._assistant.files_to_review()
 
-        async def review_file(req, delay):
-            await asyncio.sleep(delay)
-            file_comments = await self._assistant.review_file(req.path)
-            for comment in file_comments:
-                print(comment)
-                print("--------")
-            return file_comments
-
-        tasks = []
-        for i, req in enumerate(review_requests):
-            delay = i * 1.5  # Stagger start times by 1.5 seconds
-            task = asyncio.create_task(review_file(req, delay))
-            tasks.append(task)
+        tasks = [
+            asyncio.create_task(self._review_file(req, delay=i * 1.5))
+            for i, req in enumerate(review_requests)
+        ]
 
         file_reviews = await asyncio.gather(*tasks)
 
-        # Flatten the list of comments
         comments: list[model.Comment] = [
-            comment for file_comments in file_reviews for comment in file_comments
+            comment
+            for file_comments in file_reviews
+            for comment in file_comments
         ]
 
         feedback = await self._assistant.get_feedback(comments)

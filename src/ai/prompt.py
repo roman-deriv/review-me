@@ -24,26 +24,25 @@ class Builder:
         )
 
     def overview(self) -> str:
-        oview = self._user_templates.get_template('overview.md').render(
+        overview = self._user_templates.get_template('overview.md').render(
             context=self._context,
         )
-        logger.log.debug(f"Finished creating overview: {oview}")
-        return oview
+        logger.log.debug(f"Finished creating overview: {overview}")
+        return overview
 
-    def file_diff(self, filename: str, source_code: list[str]) -> str:
-        fdiff = self._user_templates.get_template('file_diff.md').render(
+    def file_diff(self, file: model.FileReviewRequest, source_code: list[str]) -> str:
+        fdiff = self._user_templates.get_template('file-diff.md').render(
             context=self._context,
-            filename=filename,
-            file=source_code,
-            diff=self._context.diffs[filename],
+            file=file,
+            source_code=source_code,
         )
         logger.log.debug(f"Finished creating file diff: {fdiff}")
         return fdiff
 
     def review_summary(self, comments: list[model.Comment]) -> str:
-        rsummary = self._user_templates.get_template('review_summary.md').render(
+        summary = self._user_templates.get_template('review-summary.md').render(
             context=self._context,
             comments=comments,
         )
-        logger.log.debug(f"Finished creating review summary: {rsummary}")
-        return rsummary
+        logger.log.debug(f"Finished creating review summary: {summary}")
+        return summary
