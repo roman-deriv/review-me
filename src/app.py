@@ -5,17 +5,8 @@ from github.PullRequest import PullRequest
 
 import ai.assistant
 import ai.tool
-import config
 import logger
 import model
-
-
-def get_pr(cfg: config.GitHubConfig):
-    gh = github.Github(cfg.token)
-    repo = gh.get_repo(cfg.repository)
-    pr = repo.get_pull(cfg.pr_number)
-    logger.log.debug(f"Pull request retrieved: #{pr.number}")
-    return pr
 
 
 def build_context(pull_request: PullRequest) -> model.ReviewContext:
