@@ -176,7 +176,7 @@ class Assistant:
             prompt=self._builder.render_template(
                 name="file-review",
                 prefix="user",
-                file=review_request,
+                review_request=review_request,
                 source_code=source_code,
             ),
             model=self._model_name,
