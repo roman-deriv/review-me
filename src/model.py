@@ -1,10 +1,11 @@
 import dataclasses
+import typing
 
 type Filename = str
 type FileDiff = str
 type CommitMessage = str
 type CommentBody = str
-type Comment = dict[str, str]
+type Comment = dict[str, typing.Any]
 
 
 @dataclasses.dataclass
@@ -33,6 +34,8 @@ class FileReviewRequest:
     changes: str
     related_changed: str
     reason: str
+    diff: str
+
 
 @dataclasses.dataclass
 class ReviewContext:
@@ -45,6 +48,22 @@ class ReviewContext:
     added_files: list[Filename]
     modified_files: list[Filename]
     deleted_files: list[Filename]
+
+
+@dataclasses.dataclass
+class Hunk:
+    start_line: int
+    end_line: int
+    changed_lines: set[int]
+
+    def contains(self, line: int) -> bool:
+        return self.start_line <= line <= self.end_line
+
+    def is_changed_line(self, line: int) -> bool:
+        return line in self.changed_lines
+
+    def nearest_change(self, line: int) -> int:
+        return min(self.changed_lines, key=lambda x: abs(x - line))
 
 
 @dataclasses.dataclass

@@ -27,7 +27,7 @@ def main():
         builder = ai.prompt.Builder(context)
         assistant = ai.assistant.Assistant(cfg.llm.model, builder)
 
-        app = App(pr, assistant, debug=cfg.debug)
+        app = App(pr, context, assistant, debug=cfg.debug)
 
         asyncio.run(app.run())
     except Exception as e:
