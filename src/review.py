@@ -1,5 +1,8 @@
+import typing
+
 from github.PullRequest import PullRequest
 
+import code.diff
 import model
 
 
@@ -29,3 +32,18 @@ def build_context(pull_request: PullRequest) -> model.ReviewContext:
         deleted_files=[file.filename for file in files if file.status == 'removed']
     )
     return context
+
+
+def parse_review_request(
+        request: dict[str, typing.Any],
+        context: model.ReviewContext,
+) -> model.FileReviewRequest:
+    diff = context.diffs[request["filename"]]
+    return model.FileReviewRequest(
+        path=request["filename"],
+        changes=request["changes"],
+        related_changed=request["related_changes"],
+        reason=request["reason"],
+        diff=diff,
+        hunks=code.diff.parse_diff(diff)
+    )
