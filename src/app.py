@@ -51,10 +51,12 @@ class App:
     def __init__(
             self,
             pull_request: PullRequest,
+            context: model.ReviewContext,
             assistant: ai.assistant.Assistant,
             debug: bool = False,
     ):
         self._pr = pull_request
+        self._context = context
         self._assistant = assistant
         self._debug = debug
 
@@ -71,7 +73,7 @@ class App:
         return file_comments
 
     async def _generate_feedback(self) -> model.Feedback:
-        review_requests = await self._assistant.files_to_review()
+        review_requests = await self._assistant.files_to_review(self._context)
 
         tasks = [
             asyncio.create_task(self._review_file(req, delay=i * 2.5))

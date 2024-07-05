@@ -1,14 +1,14 @@
 {% extends 'review-base.md' %}
 
 {% block content -%}
-Original file: {{ file.path }}
+Original file: {{ review_request.path }}
 {% for line in source_code -%}
 {{ loop.index }} | {{ line }}
 {%- endfor %}
 ----------
 
-Changes in related files: {{ file.related_changed }}
-Summary of changes in this file: {{ file.changes }}
-Diff for file: {{ file.path }}
-{{ context.diffs[file.path] }}
+Changes in related files: {{ review_request.related_changed }}
+Summary of changes in this file: {{ review_request.changes }}
+Diff for file: {{ review_request.path }}
+{{ review_request.diff }}
 {% endblock %}
