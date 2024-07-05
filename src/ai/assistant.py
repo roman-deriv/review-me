@@ -45,7 +45,7 @@ def parse_diff(patch: str) -> list[model.Hunk]:
     return hunks
 
 
-def is_valid_comment(comment: model.Comment, hunks: list[model.Hunk]) -> bool:
+def is_comment_in_hunk(comment: model.Comment, hunks: list[model.Hunk]) -> bool:
     return any([hunk.contains_comment(comment) for hunk in hunks])
 
 
@@ -118,9 +118,14 @@ class Assistant:
                 logger.log.debug(f"Skipping {severity} comment: {comment}")
                 continue
 
-            if not is_valid_comment(comment, hunks):
-                logger.log.debug(f"Skipping invalid comment: {comment}")
-                continue
+            if not is_comment_in_hunk(comment, hunks):
+                # Treat this as a file comment
+                if "end_line" in comment:
+                    del comment["end_line"]
+                if "start_line" in comment:
+                    del comment["start_line"]
+
+                logger.log.debug(f"Comment does not belong to a hunk: {comment}")
 
             # override path for determinism
             comment.update(path=review_request.path)
