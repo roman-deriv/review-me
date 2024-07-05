@@ -71,7 +71,6 @@ class Assistant:
         )
 
         hunks = code.diff.parse_diff(review_request.diff)
-        logger.log.debug(f"Diff", type(review_request.diff))
         logger.log.debug(f"Hunks: {hunks}")
 
         with open(review_request.path, "r") as source_file:

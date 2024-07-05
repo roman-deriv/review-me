@@ -26,6 +26,9 @@ class App:
             review_request: model.FileReviewRequest,
             delay: float,
     ) -> list[model.Comment]:
+        if not review_request.diff:
+            return []
+
         # Stagger request start times to comply with rate limits
         logger.log.debug(f"Waiting {delay} seconds before reviewing")
         await asyncio.sleep(delay)
