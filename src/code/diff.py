@@ -98,6 +98,8 @@ def adjust_comment_to_best_hunk(
     adjusted_start = hunk.nearest_change(adjusted_start)
     adjusted_end = hunk.nearest_change(adjusted_end)
 
-    comment["start_line"] = adjusted_start
-    comment["end_line"] = adjusted_end
-    return comment
+    return {
+        **comment,
+        "start_line": adjusted_start,
+        "end_line": adjusted_end,
+    }

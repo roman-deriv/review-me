@@ -69,6 +69,8 @@ class Assistant:
         )
 
         hunks = code.diff.parse_diff(review_request.diff)
+        logger.log.debug(f"Hunks: {hunks}")
+
         with open(review_request.path, "r") as source_file:
             source_code = source_file.readlines()
 
@@ -94,20 +96,24 @@ class Assistant:
 
             if "start_line" not in comment:
                 comment["start_line"] = comment["end_line"]
-            comment = code.diff.adjust_comment_to_best_hunk(hunks, comment)
-            if not comment:
+
+            adjusted_comment = code.diff.adjust_comment_to_best_hunk(hunks, comment)
+            if not adjusted_comment:
                 logger.log.debug(f"No suitable hunk for comment: {comment}")
                 continue
+            else:
+                comment = adjusted_comment
 
             # override path for determinism
             comment.update(path=review_request.path)
+
             if "end_line" in comment:
                 if "start_line" in comment:
                     if int(comment["start_line"]) >= int(comment["end_line"]):
                         del comment["start_line"]
 
-                # replace `end_line` with `line`
                 comment.update(line=comment.pop("end_line"))
+
             if "end_side" in comment:
                 # replace `end_side` with `side`
                 comment.update(side=comment.pop("end_side"))
