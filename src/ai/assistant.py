@@ -119,13 +119,19 @@ class Assistant:
                 continue
 
             if not is_comment_in_hunk(comment, hunks):
-                # Treat this as a file comment
-                if "end_line" in comment:
-                    del comment["end_line"]
+                logger.log.debug(f"Comment does not belong to a hunk: {comment}")
+
+                line = comment["end_line"]
+                nearest_lines = [
+                    hunk.nearest_line(line)
+                    for hunk in hunks
+                ]
+                nearest_line = min(nearest_lines, key=lambda x: abs(x - line))
+                logger.log.debug(f"Nearest line: {nearest_line}")
+
+                comment["end_line"] = nearest_line
                 if "start_line" in comment:
                     del comment["start_line"]
-
-                logger.log.debug(f"Comment does not belong to a hunk: {comment}")
 
             # override path for determinism
             comment.update(path=review_request.path)

@@ -83,6 +83,9 @@ class Hunk:
 
         return False
 
+    def nearest_line(self, line: int) -> int:
+        return min(self.changed_lines, key=lambda x: abs(x - line))
+
 
 @dataclasses.dataclass
 class Feedback:
