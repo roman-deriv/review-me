@@ -180,6 +180,9 @@ class Assistant:
             if "start_line" not in comment:
                 comment["start_line"] = comment["end_line"]
             comment = adjust_comment_to_best_hunk(hunks, comment)
+            if not comment:
+                logger.log.debug(f"No suitable hunk for comment: {comment}")
+                continue
 
             # override path for determinism
             comment.update(path=review_request.path)
