@@ -133,7 +133,7 @@ class Assistant:
         system_prompt = prompt.load("overview")
         results = await tool_completion(
             system_prompt=system_prompt,
-            prompt=self._builder.overview(),
+            prompt=self._builder.render_template("overview"),
             model=self._model_name,
             tools=[self._tools["review_files"]],
             tool_override="review_files",
@@ -164,7 +164,11 @@ class Assistant:
 
         results = await tool_completion(
             system_prompt=system_prompt,
-            prompt=self._builder.file_review(review_request, source_code),
+            prompt=self._builder.render_template(
+                name="file-review",
+                file=review_request,
+                source_code=source_code,
+            ),
             model=self._model_name,
             tools=[self._tools["post_feedback"]],
             tool_override="post_feedback",
@@ -211,7 +215,10 @@ class Assistant:
         system_prompt = prompt.load("review-summary")
         response = await tool_completion(
             system_prompt=system_prompt,
-            prompt=self._builder.review_summary(comments),
+            prompt=self._builder.render_template(
+                name="review-summary",
+                comments=comments,
+            ),
             model=self._model_name,
             tools=[self._tools["submit_review"]],
             tool_override="submit_review",

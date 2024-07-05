@@ -22,27 +22,13 @@ class Builder:
             loader=jinja2.FileSystemLoader(PROMPT_DIR / 'user'),
         )
 
-    def overview(self) -> str:
-        overview = self._user_templates.get_template('overview.md').render(
+    def _load_template(self, name: str) -> jinja2.Template:
+        return self._user_templates.get_template(name)
+
+    def render_template(self, name: str, **kwargs) -> str:
+        template = self._load_template(f"{name}.md")
+        overview = template.render(
             context=self._context,
+            **kwargs
         )
         return overview
-
-    def file_review(
-            self,
-            review_request: model.FileReviewRequest,
-            source_code: list[str],
-    ) -> str:
-        diff = self._user_templates.get_template('file-review.md').render(
-            context=self._context,
-            review_request=review_request,
-            source_code=source_code,
-        )
-        return diff
-
-    def review_summary(self, comments: list[model.Comment]) -> str:
-        summary = self._user_templates.get_template('review-summary.md').render(
-            context=self._context,
-            comments=comments,
-        )
-        return summary
