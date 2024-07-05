@@ -66,6 +66,7 @@ class App:
             delay: float,
     ) -> list[model.Comment]:
         # Stagger request start times to comply with rate limits
+        logger.log.debug(f"Waiting {delay} seconds before reviewing")
         await asyncio.sleep(delay)
 
         file_comments = await self._assistant.review_file(review_request)
@@ -76,7 +77,7 @@ class App:
         review_requests = await self._assistant.files_to_review(self._context)
 
         tasks = [
-            asyncio.create_task(self._review_file(req, delay=i * 3))
+            asyncio.create_task(self._review_file(req, delay=i * 3.5))
             for i, req in enumerate(review_requests)
         ]
 
