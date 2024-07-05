@@ -1,3 +1,4 @@
+import re
 from enum import IntEnum
 
 import logger
@@ -5,6 +6,47 @@ import model
 from . import prompt
 from .anthropic import tool_completion
 from .tool import get_all_tools
+
+
+def parse_diff(patch: str) -> list[model.Hunk]:
+    hunks = []
+    current_hunk = None
+    current_line = 0
+
+    for line in patch.split('\n'):
+        if line.startswith("@@"):
+            # Start of a new hunk
+            match = re.search(r"@@ -\d+,\d+ \+(\d+),(\d+) @@", line)
+            if match:
+                if current_hunk:
+                    hunks.append(current_hunk)
+                start_line = int(match.group(1))
+                line_count = int(match.group(2))
+                end_line = start_line + line_count - 1
+                current_hunk = model.Hunk(
+                    start_line=start_line,
+                    end_line=end_line,
+                    changed_lines=set(),
+                )
+                current_line = start_line
+        elif current_hunk:
+            if line.startswith("+"):
+                # This is an added or modified line
+                current_hunk.changed_lines.add(current_line)
+                current_line += 1
+            elif not line.startswith("-"):
+                # This is an unchanged line
+                current_line += 1
+
+    # Add the last hunk
+    if current_hunk:
+        hunks.append(current_hunk)
+
+    return hunks
+
+
+def is_valid_comment(comment: model.Comment, hunks: list[model.Hunk]) -> bool:
+    return any([hunk.contains_comment(comment) for hunk in hunks])
 
 
 class Severity(IntEnum):
@@ -25,7 +67,10 @@ class Assistant:
         self._builder = builder
         self._tools = get_all_tools()
 
-    async def files_to_review(self) -> list[model.FileReviewRequest]:
+    async def files_to_review(
+            self,
+            context: model.ReviewContext,
+    ) -> list[model.FileReviewRequest]:
         system_prompt = prompt.load("overview")
         results = await tool_completion(
             system_prompt=system_prompt,
@@ -40,6 +85,7 @@ class Assistant:
                 changes=req["changes"],
                 related_changed=req["related_changes"],
                 reason=req["reason"],
+                diff=context.diffs[req["filename"]],
             )
             for req in results["files"]
         ]
@@ -48,17 +94,18 @@ class Assistant:
 
     async def review_file(
             self,
-            file: model.FileReviewRequest,
+            review_request: model.FileReviewRequest,
             severity_limit: int = Severity.OPTIONAL,
     ) -> list[model.Comment]:
         system_prompt = prompt.load("file-review")
 
-        with open(file.path, "r") as source_file:
+        hunks = parse_diff(review_request.diff)
+        with open(review_request.path, "r") as source_file:
             source_code = source_file.readlines()
 
         results = await tool_completion(
             system_prompt=system_prompt,
-            prompt=self._builder.file_review(file, source_code),
+            prompt=self._builder.file_review(review_request, source_code),
             model=self._model_name,
             tools=[self._tools["post_feedback"]],
             tool_override="post_feedback",
@@ -71,8 +118,12 @@ class Assistant:
                 logger.log.debug(f"Skipping {severity} comment: {comment}")
                 continue
 
+            if not is_valid_comment(comment, hunks):
+                logger.log.debug(f"Skipping invalid comment: {comment}")
+                continue
+
             # override path for determinism
-            comment.update(path=file.path)
+            comment.update(path=review_request.path)
             if "end_line" in comment:
                 if "start_line" in comment:
                     if int(comment["start_line"]) >= int(comment["end_line"]):
@@ -87,7 +138,7 @@ class Assistant:
             logger.log.debug(f"File comment ({severity}): {comment}")
             comments.append(comment)
 
-        logger.log.debug(f"Finished file review for `{file.path}`")
+        logger.log.debug(f"Finished file review for `{review_request.path}`")
 
         return comments
 
