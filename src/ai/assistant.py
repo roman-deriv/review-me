@@ -73,16 +73,12 @@ class Assistant:
         hunks = code.diff.parse_diff(review_request.diff)
         logger.log.debug(f"Hunks: {hunks}")
 
-        with open(review_request.path, "r") as source_file:
-            source_code = source_file.readlines()
-
         results = await tool_completion(
             system_prompt=system_prompt,
             prompt=self._builder.render_template(
                 name="file-review",
                 prefix="user",
                 review_request=review_request,
-                source_code=source_code,
             ),
             model=self._model_name,
             tools=[self._tools["post_feedback"]],

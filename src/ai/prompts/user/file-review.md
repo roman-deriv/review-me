@@ -2,13 +2,18 @@
 
 {% block content -%}
 Original file: {{ review_request.path }}
-{% for line in source_code -%}
-{{ loop.index }} | {{ line }}
-{%- endfor %}
-----------
-
-Changes in related files: {{ review_request.related_changed }}
 Summary of changes in this file: {{ review_request.changes }}
+Changes in related files: {{ review_request.related_changed }}
+
+Hunks:
+{% for hunk in review_request.hunks -%}
+Hunk {{ loop.index }}:
+    Start Line: {{ hunk.start_line }}
+    End Line: {{ hunk.end_line }}
+    Changed Lines {{ hunk.changed_lines }}
+----------
+{%- endfor %}
+
 Diff for file: {{ review_request.path }}
 {{ review_request.diff }}
 {% endblock %}
