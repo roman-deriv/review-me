@@ -9,7 +9,8 @@ import ai.prompt
 import code.pull_request
 import config
 import logger
-from app import App, build_context
+import review
+from app import App
 
 
 def main():
@@ -25,7 +26,7 @@ def main():
         sys.exit(42)
 
     try:
-        context = build_context(pr)
+        context = review.build_context(pr)
         logger.log.debug(f"Context built successfully: {context.title}")
         builder = ai.prompt.Builder(context)
         assistant = ai.assistant.Assistant(cfg.llm.model, builder)
