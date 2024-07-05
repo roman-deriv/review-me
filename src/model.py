@@ -29,28 +29,6 @@ class AppConfig:
 
 
 @dataclasses.dataclass
-class FileReviewRequest:
-    path: str
-    changes: str
-    related_changed: str
-    reason: str
-    diff: str
-
-
-@dataclasses.dataclass
-class ReviewContext:
-    title: str
-    description: str
-    commit_messages: list[CommitMessage]
-    issue_comments: list[CommentBody]
-    review_comments: list[CommentBody]
-    diffs: dict[Filename, FileDiff]
-    added_files: list[Filename]
-    modified_files: list[Filename]
-    deleted_files: list[Filename]
-
-
-@dataclasses.dataclass
 class Hunk:
     start_line: int
     end_line: int
@@ -64,6 +42,29 @@ class Hunk:
 
     def nearest_change(self, line: int) -> int:
         return min(self.changed_lines, key=lambda x: abs(x - line))
+
+
+@dataclasses.dataclass
+class FileReviewRequest:
+    path: str
+    changes: str
+    related_changed: str
+    reason: str
+    diff: str
+    hunks: list[Hunk]
+
+
+@dataclasses.dataclass
+class ReviewContext:
+    title: str
+    description: str
+    commit_messages: list[CommitMessage]
+    issue_comments: list[CommentBody]
+    review_comments: list[CommentBody]
+    diffs: dict[Filename, FileDiff]
+    added_files: list[Filename]
+    modified_files: list[Filename]
+    deleted_files: list[Filename]
 
 
 @dataclasses.dataclass

@@ -1,9 +1,11 @@
 import re
+import typing
 from enum import IntEnum
 
 import code.diff
 import logger
 import model
+import review
 from . import prompt
 from .anthropic import tool_completion
 from .tool import get_all_tools
@@ -45,17 +47,15 @@ class Assistant:
             tools=[self._tools["review_files"]],
             tool_override="review_files",
         )
+
         files = [
-            model.FileReviewRequest(
-                path=req["filename"],
-                changes=req["changes"],
-                related_changed=req["related_changes"],
-                reason=req["reason"],
-                diff=context.diffs[req["filename"]],
-            )
+            review.parse_review_request(req, context)
             for req in results["files"]
         ]
-        logger.log.debug(f"Files to review: {files}")
+        logger.log.debug(
+            f"Files to review: \n"
+            f"- {"\n- ".join([f.path for f in files])}"
+        )
         return files
 
     async def review_file(
@@ -70,11 +70,7 @@ class Assistant:
             prefix="system",
         )
 
-        hunks = code.diff.parse_diff(review_request.diff)
-        logger.log.debug(f"Hunks: {hunks}")
-
-        with open(review_request.path, "r") as source_file:
-            source_code = source_file.readlines()
+        logger.log.debug(f"Hunks: {review_request.hunks}")
 
         results = await tool_completion(
             system_prompt=system_prompt,
@@ -82,7 +78,6 @@ class Assistant:
                 name="file-review",
                 prefix="user",
                 review_request=review_request,
-                source_code=source_code,
             ),
             model=self._model_name,
             tools=[self._tools["post_feedback"]],
@@ -99,7 +94,10 @@ class Assistant:
             if "start_line" not in comment:
                 comment["start_line"] = comment["end_line"]
 
-            adjusted_comment = code.diff.adjust_comment_to_best_hunk(hunks, comment)
+            adjusted_comment = code.diff.adjust_comment_to_best_hunk(
+                review_request.hunks,
+                comment,
+            )
             if not adjusted_comment:
                 logger.log.debug(f"No suitable hunk for comment: {comment}")
                 continue

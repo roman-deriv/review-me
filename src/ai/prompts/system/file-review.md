@@ -32,6 +32,13 @@ Your goal is to provide meaningful, actionable feedback on the changes while mai
      - Error handling
      - Abstraction and refactoring opportunities
 
+## Comment Rules
+
+- All comments must reside within a single hunk
+  - Comment start line cannot come before hunk start line
+  - Comment end line cannot come after hunk end line
+  - Start and end lines must be within the same hunk 
+
 ## Examples
 
 ### Bad Comments
