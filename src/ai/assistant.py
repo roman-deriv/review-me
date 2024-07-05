@@ -130,10 +130,16 @@ class Assistant:
             self,
             context: model.ReviewContext,
     ) -> list[model.FileReviewRequest]:
-        system_prompt = prompt.load("overview")
+        system_prompt = self._builder.render_template(
+            name="overview",
+            prefix="system",
+        )
         results = await tool_completion(
             system_prompt=system_prompt,
-            prompt=self._builder.render_template("overview"),
+            prompt=self._builder.render_template(
+                name="overview",
+                prefix="user",
+            ),
             model=self._model_name,
             tools=[self._tools["review_files"]],
             tool_override="review_files",
@@ -156,7 +162,10 @@ class Assistant:
             review_request: model.FileReviewRequest,
             severity_limit: int = Severity.OPTIONAL,
     ) -> list[model.Comment]:
-        system_prompt = prompt.load("file-review")
+        system_prompt = self._builder.render_template(
+            name="file-review",
+            prefix="system",
+        )
 
         hunks = parse_diff(review_request.diff)
         with open(review_request.path, "r") as source_file:
@@ -166,6 +175,7 @@ class Assistant:
             system_prompt=system_prompt,
             prompt=self._builder.render_template(
                 name="file-review",
+                prefix="user",
                 file=review_request,
                 source_code=source_code,
             ),
@@ -212,11 +222,15 @@ class Assistant:
             self,
             comments: list[model.Comment],
     ) -> model.Feedback:
-        system_prompt = prompt.load("review-summary")
+        system_prompt = self._builder.render_template(
+            name="review-summary",
+            prefix="system",
+        )
         response = await tool_completion(
             system_prompt=system_prompt,
             prompt=self._builder.render_template(
                 name="review-summary",
+                prefix="user",
                 comments=comments,
             ),
             model=self._model_name,
