@@ -39,4 +39,4 @@ def from_env() -> AppConfig:
         return config
     except Exception as e:
         logger.log.critical(f"Failed to load environment: {e}")
-        sys.exit(69)
+        sys.exit(42)
