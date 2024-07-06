@@ -1,10 +1,10 @@
 import re
 
 import logger
-import model
+from . import model
 
 
-def parse_diff(patch: str) -> list[model.Hunk]:
+def parse_diff(patch: str) -> list[model.HunkModel]:
     hunks = []
     current_hunk = None
     current_line = 0
@@ -19,7 +19,7 @@ def parse_diff(patch: str) -> list[model.Hunk]:
                 start_line = int(match.group(1))
                 line_count = int(match.group(2))
                 end_line = start_line + line_count - 1
-                current_hunk = model.Hunk(
+                current_hunk = model.HunkModel(
                     start_line=start_line,
                     end_line=end_line,
                     changed_lines=set(),
@@ -42,11 +42,11 @@ def parse_diff(patch: str) -> list[model.Hunk]:
 
 
 def adjust_comment_to_best_hunk(
-        hunks: list[model.Hunk],
-        comment: model.Comment,
-) -> model.Comment | None:
-    comment_start = comment["start_line"]
-    comment_end = comment["end_line"]
+        hunks: list[model.HunkModel],
+        comment: model.CommentBoundsModel,
+) -> model.CommentBoundsModel | None:
+    comment_start = comment.start_line
+    comment_end = comment.end_line
 
     logger.log.debug(f"Comment start line: {comment_start}")
     logger.log.debug(f"Comment end line: {comment_end}")
@@ -114,8 +114,7 @@ def adjust_comment_to_best_hunk(
     logger.log.debug(f"Final start line: {adjusted_start}")
     logger.log.debug(f"Final end line: {adjusted_end}")
 
-    return {
-        **comment,
-        "start_line": adjusted_start,
-        "end_line": adjusted_end,
-    }
+    return model.CommentBoundsModel(
+        start_line=adjusted_start,
+        end_line=adjusted_end,
+    )
