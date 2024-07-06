@@ -1,4 +1,5 @@
 import dataclasses
+import enum
 import typing
 
 type Filename = str
@@ -7,6 +8,18 @@ type CommitMessage = str
 type CommentBody = str
 type Comment = dict[str, typing.Any]
 type Tool = dict[str, typing.Any]
+
+
+class Severity(enum.IntEnum):
+    CRITICAL = 0
+    MAJOR = 1
+    OPTIONAL = 2
+    MINOR = 3
+    NO_CHANGE = 4
+
+    @classmethod
+    def from_string(cls, s):
+        return cls[s.upper()]
 
 
 @dataclasses.dataclass
