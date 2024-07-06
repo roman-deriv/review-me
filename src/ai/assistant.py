@@ -1,5 +1,3 @@
-import re
-import typing
 from enum import IntEnum
 
 import code.diff
@@ -29,7 +27,7 @@ class Assistant:
         self._builder = builder
         self._tools = get_all_tools()
 
-    async def files_to_review(
+    async def request_reviews(
             self,
             context: model.ReviewContext,
     ) -> list[model.FileReviewRequest]:
@@ -52,10 +50,6 @@ class Assistant:
             review.parse_review_request(req, context)
             for req in results["files"]
         ]
-        logger.log.debug(
-            f"Files to review: \n"
-            f"- {"\n- ".join([f.path for f in files])}"
-        )
         return files
 
     async def review_file(

@@ -1,8 +1,11 @@
-import github
 import sys
+
+import github
+from github.PullRequest import PullRequest
 
 import config
 import logger
+import model
 
 
 def get_pr(cfg: config.GitHubConfig):
@@ -14,10 +17,22 @@ def get_pr(cfg: config.GitHubConfig):
     except Exception as e:
         logger.log.critical(f"Couldn't retrieve pull request: {e}")
         sys.exit(69)
-        
 
-def comment(pr, message):
+
+def comment(pull_request: PullRequest, message: str):
     try:
-        pr.create_issue_comment(message)
+        pull_request.create_issue_comment(message)
+    except github.GithubException as e:
+        logger.log.warning(f"Could not post comment to GitHub: {e}")
     except Exception as e:
-        logger.log.error(f"Problem posting comment: {e}")
+        logger.log.warning(f"Unknown problem posting comment: {e}")
+
+
+def submit_review(pull_request: PullRequest, feedback: model.Feedback):
+    pull_request.create_review(
+        body=f"{feedback.summary}\n\n"
+             f"{feedback.overall_comment}\n\n"
+             f"{feedback.evaluation}",
+        comments=feedback.comments,
+        event="COMMENT",
+    )
