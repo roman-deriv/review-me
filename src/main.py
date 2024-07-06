@@ -27,7 +27,7 @@ def main():
 
     try:
         pr.create_issue_comment(
-                f'Your review of "{pr.title}" has started./n Your review will be posted shortly.'
+                f'Your review of "{pr.title}" has started.\n Your review will be posted shortly.'
             )
         context = review.build_context(pr)
         logger.log.debug(f"Context built successfully: {context.title}")
@@ -40,7 +40,6 @@ def main():
     except github.GithubException as e:
             logger.log.error(f"Problem posting error comment: {e}")
             sys.exit(69)
-
     except Exception as e:
         logger.log.error(f"Problem during run: {e}")
         try:
