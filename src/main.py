@@ -5,9 +5,9 @@ import traceback
 import ai.assistant
 import ai.prompt
 import code.pull_request
+import code.review
 import config
 import logger
-import review
 from app import App
 
 
@@ -22,7 +22,7 @@ def main():
             f'Your review of "{pr.title}" has started.\n'
             f'Your review will be posted shortly.'
         )
-        context = review.build_context(pr)
+        context = code.review.build_context(pr)
         logger.log.debug(f"Context built successfully: {context.title}")
         builder = ai.prompt.Builder(context)
         assistant = ai.assistant.Assistant(cfg.llm.model, builder)
