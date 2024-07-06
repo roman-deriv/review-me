@@ -17,3 +17,6 @@ def get_all_tools() -> dict[str, dict[str, Any]]:
         tool_name = file.stem
         tools[tool_name] = load_tool(tool_name)
     return tools
+
+
+TOOLS = get_all_tools()

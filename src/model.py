@@ -6,6 +6,7 @@ type FileDiff = str
 type CommitMessage = str
 type CommentBody = str
 type Comment = dict[str, typing.Any]
+type Tool = dict[str, typing.Any]
 
 
 @dataclasses.dataclass

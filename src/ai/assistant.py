@@ -1,4 +1,3 @@
-import re
 import typing
 from enum import IntEnum
 
@@ -8,7 +7,28 @@ import model
 import review
 from . import prompt
 from .anthropic import tool_completion
-from .tool import get_all_tools
+from .tool import TOOLS
+
+
+async def single_tool_query(
+        prompt_name: str,
+        tool_name: str,
+        model_name: str,
+        builder: prompt.Builder,
+) -> dict[str, typing.Any]:
+    return await tool_completion(
+        system_prompt=builder.render_template(
+            name=prompt_name,
+            prefix="system",
+        ),
+        prompt=builder.render_template(
+            name=prompt_name,
+            prefix="user",
+        ),
+        model=model_name,
+        tools=[TOOLS[tool_name]],
+        tool_override=tool_name,
+    )
 
 
 class Severity(IntEnum):
@@ -27,35 +47,22 @@ class Assistant:
     def __init__(self, model_name: str, builder: prompt.Builder):
         self._model_name = model_name
         self._builder = builder
-        self._tools = get_all_tools()
 
-    async def files_to_review(
+    async def request_reviews(
             self,
             context: model.ReviewContext,
     ) -> list[model.FileReviewRequest]:
-        system_prompt = self._builder.render_template(
-            name="overview",
-            prefix="system",
-        )
-        results = await tool_completion(
-            system_prompt=system_prompt,
-            prompt=self._builder.render_template(
-                name="overview",
-                prefix="user",
-            ),
-            model=self._model_name,
-            tools=[self._tools["review_files"]],
-            tool_override="review_files",
+        results = await single_tool_query(
+            prompt_name="overview",
+            tool_name="review_files",
+            model_name=self._model_name,
+            builder=self._builder,
         )
 
         files = [
             review.parse_review_request(req, context)
-            for req in results["files"]
+            for req in results.get("files", [])
         ]
-        logger.log.debug(
-            f"Files to review: \n"
-            f"- {"\n- ".join([f.path for f in files])}"
-        )
         return files
 
     async def review_file(
@@ -64,24 +71,13 @@ class Assistant:
             severity_limit: int = Severity.OPTIONAL,
     ) -> list[model.Comment]:
         logger.log.debug(f"Reviewing file: {review_request.path}")
-
-        system_prompt = self._builder.render_template(
-            name="file-review",
-            prefix="system",
-        )
-
         logger.log.debug(f"Hunks: {review_request.hunks}")
 
-        results = await tool_completion(
-            system_prompt=system_prompt,
-            prompt=self._builder.render_template(
-                name="file-review",
-                prefix="user",
-                review_request=review_request,
-            ),
-            model=self._model_name,
-            tools=[self._tools["post_feedback"]],
-            tool_override="post_feedback",
+        results = await single_tool_query(
+            prompt_name="file-review",
+            tool_name="post_feedback",
+            model_name=self._model_name,
+            builder=self._builder,
         )
 
         comments = []
@@ -115,7 +111,6 @@ class Assistant:
                 comment.update(line=comment.pop("end_line"))
 
             if "end_side" in comment:
-                # replace `end_side` with `side`
                 comment.update(side=comment.pop("end_side"))
 
             logger.log.debug(f"File comment ({severity}): {comment}")
@@ -129,25 +124,16 @@ class Assistant:
             self,
             comments: list[model.Comment],
     ) -> model.Feedback:
-        system_prompt = self._builder.render_template(
-            name="review-summary",
-            prefix="system",
+        results = await single_tool_query(
+            prompt_name="review-summary",
+            tool_name="submit_review",
+            model_name=self._model_name,
+            builder=self._builder,
         )
-        response = await tool_completion(
-            system_prompt=system_prompt,
-            prompt=self._builder.render_template(
-                name="review-summary",
-                prefix="user",
-                comments=comments,
-            ),
-            model=self._model_name,
-            tools=[self._tools["submit_review"]],
-            tool_override="submit_review",
-        )
-        feedback = model.Feedback(
+
+        return model.Feedback(
             comments=comments,
-            summary=response["summary"],
-            overall_comment=response["feedback"],
-            evaluation=response["event"],
+            summary=results["summary"],
+            overall_comment=results["feedback"],
+            evaluation=results["event"],
         )
-        return feedback

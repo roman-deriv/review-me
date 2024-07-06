@@ -17,7 +17,11 @@ def main():
     logger.log.debug(f"Pull request retrieved: #{pr.number}")
 
     try:
-        code.pull_request.comment(pr, f'Your review of "{pr.title}" has started.\nYour review will be posted shortly.')
+        code.pull_request.comment(
+            pr,
+            f'Your review of "{pr.title}" has started.\n'
+            f'Your review will be posted shortly.'
+        )
         context = review.build_context(pr)
         logger.log.debug(f"Context built successfully: {context.title}")
         builder = ai.prompt.Builder(context)
@@ -29,10 +33,10 @@ def main():
     except Exception as e:
         logger.log.error(f"Problem during run: {e}")
         code.pull_request.comment(
-            pr, 
+            pr,
             f"Sorry, couldn't review your code because\n"
             f"```{traceback.format_exc()}```"
-            )
+        )
         sys.exit(42)
 
 
