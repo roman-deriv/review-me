@@ -1,7 +1,7 @@
+import code.review
 import logger
 import model
-import review
-from . import prompt
+from . import prompt, schema
 from .anthropic import tool_completion
 from .tool import TOOLS
 
@@ -19,7 +19,7 @@ class Assistant:
             name="overview",
             prefix="system",
         )
-        results = await tool_completion(
+        results: schema.ReviewRequestsResponseModel = await tool_completion(
             system_prompt=system_prompt,
             prompt=self._builder.render_template(
                 name="overview",
@@ -30,7 +30,7 @@ class Assistant:
             tool_override="review_files",
         )
 
-        return review.parse_review_requests(
+        return code.review.parse_review_requests(
             requests=results,
             context=context,
         )
@@ -61,7 +61,7 @@ class Assistant:
             tool_override="post_feedback",
         )
 
-        return review.parse_review(
+        return code.review.parse_review(
             review=file_review,
             review_request=review_request,
             severity_limit=severity_limit,
@@ -87,7 +87,7 @@ class Assistant:
             tool_override="submit_review",
         )
 
-        return review.parse_feedback(
+        return code.review.parse_feedback(
             feedback=feedback,
             comments=comments,
         )
