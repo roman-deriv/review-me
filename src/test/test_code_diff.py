@@ -6,13 +6,39 @@ from test import fixture
 
 
 class TestCodeDiff(unittest.TestCase):
-    def test_parse_diff(self):
+    def test_parse_single_hunk_diff(self):
         patch = fixture.single_hunk_patch
         hunks = diff.parse_diff(patch)
         self.assertEqual(len(hunks), 1)
         self.assertEqual(hunks[0].start_line, 1)
         self.assertEqual(hunks[0].end_line, 4)
         self.assertEqual(hunks[0].changed_lines, {2, 3})
+
+    def test_parse_modified_file_diff(self):
+        patch = fixture.load_fixture("modified-file-patch.md")
+        hunks = diff.parse_diff(patch)
+        self.assertEqual(len(hunks), 2)
+        
+        self.assertEqual(hunks[0].start_line, 6)
+        self.assertEqual(hunks[0].end_line, 23)
+        self.assertEqual(hunks[0].changed_lines, {9, 12, 13, 19, 20})
+        
+        self.assertEqual(hunks[1].start_line, 26)
+        self.assertEqual(hunks[1].end_line, 33)
+        self.assertEqual(hunks[1].changed_lines, {29, 30})
+
+    def test_parse_new_file_diff(self):
+        patch = fixture.load_fixture("new-file-patch.md")
+        hunks = diff.parse_diff(patch)
+        self.assertEqual(len(hunks), 1)
+        self.assertEqual(hunks[0].start_line, 1)
+        self.assertEqual(hunks[0].end_line, 31)
+        self.assertEqual(hunks[0].changed_lines, set(range(1, 32)))  # All lines are new
+
+    def test_parse_empty_diff(self):
+        patch = ""
+        hunks = diff.parse_diff(patch)
+        self.assertEqual(len(hunks), 0)
 
 
 class TestAdjustCommentToBestHunk(unittest.TestCase):
