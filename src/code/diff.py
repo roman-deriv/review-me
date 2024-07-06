@@ -1,5 +1,6 @@
 import re
 
+import logger
 import model
 
 
@@ -46,6 +47,10 @@ def adjust_comment_to_best_hunk(
 ) -> model.Comment | None:
     comment_start = comment["start_line"]
     comment_end = comment["end_line"]
+
+    logger.log.debug(f"Comment start line: {comment_start}")
+    logger.log.debug(f"Comment end line: {comment_end}")
+
     best_hunk = None
     best_overlap = 0
     nearest_hunk = None
@@ -83,20 +88,31 @@ def adjust_comment_to_best_hunk(
     elif nearest_hunk:
         hunk = nearest_hunk
     else:
+        # Theoretically, we should never get here...
         return None  # No suitable hunk found
 
     # Adjust comment to fit within the hunk while preserving its length
+    # Shift the hunk to the first modified line in the hunk
     comment_length = comment_end - comment_start
-    adjusted_start = max(comment_start, hunk.start_line)
+    adjusted_start = max(comment_start, min(hunk.changed_lines))
     adjusted_end = adjusted_start + comment_length
 
+    logger.log.debug(f"Shifted start line: {adjusted_start}")
+    logger.log.debug(f"Shifted end line: {adjusted_end}")
+
     if adjusted_end > hunk.end_line:
-        adjusted_end = hunk.end_line
+        adjusted_end = max(hunk.changed_lines)
         adjusted_start = adjusted_end - comment_length
+
+    logger.log.debug(f"Adjusted start line: {adjusted_start}")
+    logger.log.debug(f"Adjusted end line: {adjusted_end}")
 
     # Ensure start and end are within the hunk's added lines
     adjusted_start = hunk.nearest_change(adjusted_start)
     adjusted_end = hunk.nearest_change(adjusted_end)
+
+    logger.log.debug(f"Final start line: {adjusted_start}")
+    logger.log.debug(f"Final end line: {adjusted_end}")
 
     return {
         **comment,
