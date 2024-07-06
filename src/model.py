@@ -62,7 +62,7 @@ class Hunk:
 class FileReviewRequest:
     path: str
     changes: str
-    related_changed: str
+    related_changes: str
     reason: str
     diff: str
     hunks: list[Hunk]
