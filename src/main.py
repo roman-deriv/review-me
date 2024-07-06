@@ -37,6 +37,10 @@ def main():
         app = App(pr, context, assistant, debug=cfg.debug)
 
         asyncio.run(app.run())
+    except github.GithubException as e:
+            logger.log.error(f"Problem posting error comment: {e}")
+            sys.exit(69)
+
     except Exception as e:
         logger.log.error(f"Problem during run: {e}")
         try:
@@ -44,6 +48,7 @@ def main():
                 f"Sorry, couldn't review your code because\n"
                 f"```{traceback.format_exc()}```"
             )
+            sys.exit(42)
         except github.GithubException as e2:
             logger.log.error(f"Problem posting error comment: {e2}")
             sys.exit(69)
