@@ -12,13 +12,9 @@ from app import App
 
 
 def main():
-    try:
-        cfg = config.from_env()
-        pr = code.pull_request.get_pr(cfg.github)
-        logger.log.debug(f"Pull request retrieved: #{pr.number}")
-    except Exception as e:
-        logger.log.critical(f"Problem during initial setup: {e}")
-        sys.exit(42)
+    cfg = config.from_env()
+    pr = code.pull_request.get_pr(cfg.github)
+    logger.log.debug(f"Pull request retrieved: #{pr.number}")
 
     try:
         code.pull_request.comment(pr, f'Your review of "{pr.title}" has started.\nYour review will be posted shortly.')

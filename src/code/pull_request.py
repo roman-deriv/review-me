@@ -12,8 +12,9 @@ def get_pr(cfg: config.GitHubConfig):
         pr = repo.get_pull(cfg.pr_number)
         return pr
     except Exception as e:
-        logger.log.critical(f"Couldn't retrieve pull request from Github: {e}")
+        logger.log.critical(f"Couldn't retrieve pull request: {e}")
         sys.exit(69)
+        
 
 def comment(pr, message):
     try:
