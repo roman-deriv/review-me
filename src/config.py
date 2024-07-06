@@ -1,9 +1,8 @@
 import json
 import os
 import sys
+
 import logger
-
-
 from model import AppConfig, GitHubConfig, LlmConfig
 
 
