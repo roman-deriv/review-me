@@ -2,9 +2,10 @@ import typing
 
 from github.PullRequest import PullRequest
 
+import ai.schema
 import code.diff
 import logger
-import model
+from . import model
 
 
 def build_context(pull_request: PullRequest) -> model.ReviewContext:
@@ -36,43 +37,44 @@ def build_context(pull_request: PullRequest) -> model.ReviewContext:
 
 
 def parse_review_request(
-        request: dict[str, typing.Any],
+        request: ai.schema.FileReviewRequestModel,
         context: model.ReviewContext,
 ) -> model.FileReviewRequest:
-    diff = context.diffs[request["filename"]]
+    diff = context.diffs[request.filename]
     return model.FileReviewRequest(
-        path=request["filename"],
-        changes=request["changes"],
-        related_changed=request["related_changes"],
-        reason=request["reason"],
+        path=request.filename,
+        changes=request.changes,
+        related_changes=request.related_changes,
+        reason=request.reason,
         diff=diff,
         hunks=code.diff.parse_diff(diff)
     )
 
 
 def parse_review_requests(
-        requests: dict[str, list[dict[str, typing.Any]]],
+        requests: ai.schema.ReviewRequestsResponseModel,
         context: model.ReviewContext,
 ) -> list[model.FileReviewRequest]:
     return [
         parse_review_request(request, context)
-        for request in requests["files"]
+        for request in requests.files
     ]
 
 
 def parse_review(
-        review: dict[str, list[dict[str, typing.Any]]],
+        review: ai.schema.FileReviewResponseModel,
         review_request: model.FileReviewRequest,
         severity_limit: int,
 ) -> list[model.Comment]:
-    comments = review["feedback"]
+    comments = review.feedback
     filtered_comments = []
     for comment in comments:
-        severity = model.Severity.from_string(comment.pop("severity"))
+        severity = model.Severity.from_string(comment.severity)
         if severity > severity_limit:
-            logger.log.debug(f"Skipping {severity} comment: {comment}")
+            logger.log.debug(f"Skipping  comment: {comment}")
             continue
 
+        comment_bounds = model.CommentBoundsModel
         if "start_line" not in comment:
             comment["start_line"] = comment["end_line"]
 
