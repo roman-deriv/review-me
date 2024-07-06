@@ -6,8 +6,9 @@ from github.Commit import Commit
 from github.IssueComment import IssueComment
 from github.PullRequestComment import PullRequestComment
 
+import ai.schema
 import model
-import review
+import code.review
 
 
 class TestReview(unittest.TestCase):
@@ -37,7 +38,7 @@ class TestReview(unittest.TestCase):
         self.mock_pr.get_review_comments.return_value = [mock_review_comment]
         self.mock_pr.get_issue_comments.return_value = [mock_issue_comment]
 
-        context = review.build_context(self.mock_pr)
+        context = code.review.build_context(self.mock_pr)
 
         self.assertEqual(context.title, "Test PR")
         self.assertEqual(context.description, "This is a test pull request")
@@ -66,18 +67,18 @@ class TestReview(unittest.TestCase):
             )
         ]
 
-        request = {
-            "filename": "test.py",
-            "changes": "Added a new line",
-            "related_changes": "None",
-            "reason": "Code improvement"
-        }
+        request = ai.schema.FileReviewRequestModel(
+            filename="test.py",
+            changes="Added a new line",
+            related_changes="None",
+            reason="Code improvement",
+        )
 
-        result = review.parse_review_request(request, mock_context)
+        result = code.review.parse_review_request(request, mock_context)
 
         self.assertEqual(result.path, "test.py")
         self.assertEqual(result.changes, "Added a new line")
-        self.assertEqual(result.related_changed, "None")
+        self.assertEqual(result.related_changes, "None")
         self.assertEqual(result.reason, "Code improvement")
         self.assertEqual(
             result.diff,
