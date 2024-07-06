@@ -26,6 +26,9 @@ def main():
         sys.exit(42)
 
     try:
+        pr.create_issue_comment(
+                f'Your review of "{pr.title}" has started, comments will be posted shortly"\''
+            )
         context = review.build_context(pr)
         logger.log.debug(f"Context built successfully: {context.title}")
         builder = ai.prompt.Builder(context)
