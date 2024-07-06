@@ -14,29 +14,67 @@ class TestCodeDiff(unittest.TestCase):
         self.assertEqual(hunks[0].end_line, 4)
         self.assertEqual(hunks[0].changed_lines, {2, 3})
 
-    def test_adjust_comment_to_best_hunk(self):
-        hunks = [
-            Hunk(start_line=1, end_line=5, changed_lines={2, 3}),
-            Hunk(start_line=10, end_line=15, changed_lines={11, 12, 13})
+
+class TestAdjustCommentToBestHunk(unittest.TestCase):
+    def setUp(self):
+        self.hunks = [
+            Hunk(start_line=5, end_line=10, changed_lines={7, 8}),
+            Hunk(start_line=15, end_line=20, changed_lines={16, 17, 18})
         ]
 
-        # Test comment within a hunk
-        comment = {"start_line": 2, "end_line": 4}
-        adjusted = diff.adjust_comment_to_best_hunk(hunks, comment)
-        self.assertEqual(adjusted["start_line"], 2)
-        self.assertEqual(adjusted["end_line"], 3)
-
-        # Test comment between hunks
+    def test_comment_within_hunk(self):
         comment = {"start_line": 7, "end_line": 9}
-        adjusted = diff.adjust_comment_to_best_hunk(hunks, comment)
-        self.assertEqual(adjusted["start_line"], 11)
-        self.assertEqual(adjusted["end_line"], 13)
+        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
+        self.assertEqual(adjusted["start_line"], 7)
+        self.assertEqual(adjusted["end_line"], 8)
 
-        # Test comment outside all hunks
-        comment = {"start_line": 20, "end_line": 22}
-        adjusted = diff.adjust_comment_to_best_hunk(hunks, comment)
-        self.assertEqual(adjusted["start_line"], 11)
-        self.assertEqual(adjusted["end_line"], 13)
+    def test_comment_between_hunks(self):
+        comment = {"start_line": 12, "end_line": 14}
+        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
+        self.assertEqual(adjusted["start_line"], 16)
+        self.assertEqual(adjusted["end_line"], 18)
+
+    def test_comment_after_all_hunks(self):
+        comment = {"start_line": 25, "end_line": 27}
+        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
+        self.assertEqual(adjusted["start_line"], 16)
+        self.assertEqual(adjusted["end_line"], 18)
+
+    def test_comment_before_all_hunks(self):
+        comment = {"start_line": 1, "end_line": 3}
+        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
+        self.assertEqual(adjusted["start_line"], 7)
+        self.assertEqual(adjusted["end_line"], 8)
+
+    def test_comment_spanning_multiple_hunks(self):
+        comment = {"start_line": 8, "end_line": 17}
+        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
+        self.assertEqual(adjusted["start_line"], 7)
+        self.assertEqual(adjusted["end_line"], 8)
+
+    def test_comment_on_unchanged_line_within_hunk(self):
+        comment = {"start_line": 9, "end_line": 9}
+        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
+        self.assertEqual(adjusted["start_line"], 8)
+        self.assertEqual(adjusted["end_line"], 8)
+
+    def test_comment_with_single_line(self):
+        comment = {"start_line": 16, "end_line": 16}
+        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
+        self.assertEqual(adjusted["start_line"], 16)
+        self.assertEqual(adjusted["end_line"], 16)
+
+    def test_comment_with_no_overlap_closer_to_second_hunk(self):
+        comment = {"start_line": 13, "end_line": 14}
+        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
+        self.assertEqual(adjusted["start_line"], 16)
+        self.assertEqual(adjusted["end_line"], 17)
+
+    def test_comment_with_partial_overlap(self):
+        comment = {"start_line": 9, "end_line": 11}
+        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
+        self.assertEqual(adjusted["start_line"], 7)
+        self.assertEqual(adjusted["end_line"], 8)
 
 
 if __name__ == '__main__':
