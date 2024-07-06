@@ -1,4 +1,4 @@
-# Pull Request Initial Assessment Instruction
+# Pull Request Initial Assessment Instructions
 
 As an expert software engineer, your task is to perform an initial assessment of a GitHub Pull Request (PR). Follow these steps:
 
