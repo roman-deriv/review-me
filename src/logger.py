@@ -8,9 +8,6 @@ def _init_logger():
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
 
-    file_handler = logging.FileHandler(LOG_FILE)
-    file_handler.setLevel(logging.INFO)
-
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.DEBUG)
 
@@ -19,7 +16,6 @@ def _init_logger():
     )
     console_handler.setFormatter(formatter)
 
-    logger.addHandler(file_handler)
     logger.addHandler(console_handler)
 
     return logger
