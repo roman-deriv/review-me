@@ -2,8 +2,6 @@ import asyncio
 import sys
 import traceback
 
-import github
-
 import ai.assistant
 import ai.prompt
 import code.pull_request
@@ -14,18 +12,12 @@ from app import App
 
 
 def main():
-    try:
-        cfg = config.from_env()
-        pr = code.pull_request.get_pr(cfg.github)
-        logger.log.debug(f"Pull request retrieved: #{pr.number}")
-    except github.GithubException as e:
-        logger.log.critical(f"Couldn't retrieve pull request from Github: {e}")
-        sys.exit(69)
-    except Exception as e:
-        logger.log.critical(f"Problem during initial setup: {e}")
-        sys.exit(42)
+    cfg = config.from_env()
+    pr = code.pull_request.get_pr(cfg.github)
+    logger.log.debug(f"Pull request retrieved: #{pr.number}")
 
     try:
+        code.pull_request.comment(pr, f'Your review of "{pr.title}" has started.\nYour review will be posted shortly.')
         context = review.build_context(pr)
         logger.log.debug(f"Context built successfully: {context.title}")
         builder = ai.prompt.Builder(context)
@@ -36,14 +28,12 @@ def main():
         asyncio.run(app.run())
     except Exception as e:
         logger.log.error(f"Problem during run: {e}")
-        try:
-            pr.create_issue_comment(
-                f"Sorry, couldn't review your code because\n"
-                f"```{traceback.format_exc()}```"
+        code.pull_request.comment(
+            pr, 
+            f"Sorry, couldn't review your code because\n"
+            f"```{traceback.format_exc()}```"
             )
-        except github.GithubException as e2:
-            logger.log.error(f"Problem posting error comment: {e2}")
-            sys.exit(69)
+        sys.exit(42)
 
 
 if __name__ == "__main__":
