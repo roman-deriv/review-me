@@ -6,6 +6,7 @@ from github.PullRequest import PullRequest
 import config
 import logger
 from . import model
+from .diff import parse_diff
 
 
 def get_pr(cfg: config.GitHubConfig):
