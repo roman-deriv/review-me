@@ -17,6 +17,9 @@ quality and reducing review time.
 
 ## Process
 
+> For a detailed explanation of how Review Me uses prompts and tools to generate reviews,
+> please see our [Prompt Strategy Document](./docs/prompt-strategy.md).
+
 The system employs a three-step approach leveraging the Anthropic API:
 
 ### Step 1: Initial Filtering
