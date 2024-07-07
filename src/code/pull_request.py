@@ -5,7 +5,8 @@ from github.PullRequest import PullRequest
 
 import config
 import logger
-from .review.model import Feedback
+from . import model
+from .diff import parse_diff
 
 
 def get_pr(cfg: config.GitHubConfig):
@@ -19,6 +20,38 @@ def get_pr(cfg: config.GitHubConfig):
         sys.exit(69)
 
 
+def build_pr_context(pull_request: PullRequest) -> model.PullRequestContextModel:
+    files = pull_request.get_files()
+    context = model.PullRequestContextModel(
+        title=pull_request.title,
+        description=pull_request.body,
+        commit_messages=[
+            commit.commit.message
+            for commit in pull_request.get_commits()
+        ],
+        review_comments=[
+            comment.body
+            for comment in pull_request.get_review_comments()
+        ],
+        issue_comments=[
+            comment.body
+            for comment in pull_request.get_issue_comments()
+        ],
+        patches={
+            file.filename: model.FilePatchModel(
+                filename=file.filename,
+                diff=file.patch or "",
+                hunks=[] if not file.patch else parse_diff(file.patch)
+            )
+            for file in files
+        },
+        added_files=[file.filename for file in files if file.status == 'added'],
+        modified_files=[file.filename for file in files if file.status == 'modified'],
+        deleted_files=[file.filename for file in files if file.status == 'removed']
+    )
+    return context
+
+
 def post_comment(pull_request: PullRequest, message: str):
     try:
         pull_request.create_issue_comment(message)
@@ -30,14 +63,13 @@ def post_comment(pull_request: PullRequest, message: str):
 
 def submit_review(
         pull_request: PullRequest,
-        feedback: Feedback,
+        body: str,
+        comments: list[model.GitHubCommentModel] = None
 ):
-    comments = [comment.dict(exclude_none=True) for comment in feedback.comments]
+    comments = [comment.dict(exclude_none=True) for comment in comments or []]
     logger.log.debug(f"Submitting review: {comments}")
     pull_request.create_review(
-        body=f"{feedback.summary}\n\n"
-             f"{feedback.overall_comment}\n\n"
-             f"{feedback.evaluation}",
+        body=body,
         comments=comments,
         event="COMMENT",
     )

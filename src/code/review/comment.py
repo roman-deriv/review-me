@@ -3,7 +3,36 @@ import ai.schema
 import logger
 from . import model
 from ..diff import adjust_comment_bounds_to_hunk, closest_hunk
-from ..model import GitHubCommentModel, Severity
+from ..model import GitHubCommentModel, PullRequestContextModel, Severity
+
+
+def parse_overview(
+        response: ai.schema.ReviewRequestsResponseModel,
+        context: PullRequestContextModel,
+) -> model.OverviewModel:
+    return model.OverviewModel(
+        initial_assessment=model.InitialAssessmentModel(
+            status=model.Status[response.initial_assessment.status],
+            summary=response.initial_assessment.summary,
+        ),
+        observations=[
+            model.ObservationModel(
+                comment=observation.comment,
+                tag=model.ObservationTag[observation.tag],
+            )
+            for observation in response.observations or []
+        ],
+        file_contexts=[
+            model.FileContextModel(
+                path=request.filename,
+                changes=request.changes,
+                related_changes=request.related_changes,
+                reason=request.reason,
+                patch=context.patches[request.filename],
+            )
+            for request in response.files_for_review or []
+        ],
+    )
 
 
 def extract_comments(

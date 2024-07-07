@@ -1,10 +1,55 @@
 {
   "name": "review_files",
-  "description": "Submit a list of files for detailed code review within a Pull Request. This tool should be used to flag files that require careful examination due to critical changes, potential issues, or significant impact on the codebase.",
+  "description": "Submit an initial assessment of a Pull Request, including optional general observations and a list of files requiring detailed review. Only provide feedback that adds significant value.",
   "input_schema": {
     "type": "object",
     "properties": {
-      "files": {
+      "initial_assessment": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACCEPTABLE",
+              "REVIEW_REQUIRED",
+              "UNACCEPTABLE"
+            ],
+            "description": "Overall status of the PR based on initial assessment"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Brief explanation of the initial assessment"
+          }
+        },
+        "required": [
+          "status",
+          "summary"
+        ]
+      },
+      "observations": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "comment": {
+              "type": "string",
+              "description": "Specific aspect or observation that needs addressing"
+            },
+            "tag": {
+              "type": "string",
+              "enum": [
+                "DOCUMENTATION",
+                "CODE_STYLE",
+                "TYPE_CHECKING",
+                "ERROR_HANDLING"
+              ],
+              "description": "The category of observation being made"
+            }
+          }
+        },
+        "description": "A list of general comments about the structure and style of the code changes"
+      },
+      "files_for_review": {
         "type": "array",
         "items": {
           "type": "object",
@@ -15,7 +60,7 @@
             },
             "changes": {
               "type": "string",
-              "description": "Concise summary of the changes made to this file in the PR"
+              "description": "Concise summary of the substantive changes made to this file in the PR"
             },
             "related_changes": {
               "type": "string",
@@ -23,7 +68,7 @@
             },
             "reason": {
               "type": "string",
-              "description": "Specific rationale for why this file needs careful review, highlighting potential concerns or areas of focus"
+              "description": "Specific rationale for why this file needs careful review, focusing on significant implementation issues, security concerns, or major architectural changes"
             }
           },
           "required": [
@@ -36,7 +81,7 @@
       }
     },
     "required": [
-      "files"
+      "initial_assessment"
     ]
   }
 }
