@@ -3,6 +3,12 @@ import enum
 from pydantic import BaseModel
 
 
+class Status(enum.StrEnum):
+    ACCEPTABLE = "ACCEPTABLE"
+    REVIEW_REQUIRED = "NEEDS_REVIEW"
+    UNACCEPTABLE = "UNACCEPTABLE"
+
+
 class Severity(enum.StrEnum):
     CRITICAL = "CRITICAL"
     MAJOR = "MAJOR"
@@ -22,6 +28,23 @@ class Event(enum.StrEnum):
     REQUEST_CHANGES = "REQUEST_CHANGES"
 
 
+class InitialAssessmentModel(BaseModel):
+    status: Status
+    summary: str
+
+
+class ObservationTag(enum.StrEnum):
+    DOCUMENTATION = "documentation"
+    CODE_STYLE = "code-style"
+    TYPE_CHECKING = "type-checking"
+    ERROR_HANDLING = "error-handling"
+
+
+class ObservationModel(BaseModel):
+    comment: str
+    tag: ObservationTag
+
+
 class FileReviewRequestModel(BaseModel):
     filename: str
     changes: str
@@ -30,7 +53,9 @@ class FileReviewRequestModel(BaseModel):
 
 
 class ReviewRequestsResponseModel(BaseModel):
-    files: list[FileReviewRequestModel]
+    initial_assessment: InitialAssessmentModel
+    observations: list[ObservationModel] | None = None
+    files_for_review: list[FileReviewRequestModel] | None = None
 
 
 class CommentModel(BaseModel):
