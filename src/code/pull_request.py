@@ -32,10 +32,12 @@ def submit_review(
         pull_request: PullRequest,
         feedback: Feedback,
 ):
+    comments = [comment.dict() for comment in feedback.comments]
+    logger.log.debug(f"Submitting review: {comments}")
     pull_request.create_review(
         body=f"{feedback.summary}\n\n"
              f"{feedback.overall_comment}\n\n"
              f"{feedback.evaluation}",
-        comments=[comment.dict() for comment in feedback.comments],
+        comments=comments,
         event="COMMENT",
     )
