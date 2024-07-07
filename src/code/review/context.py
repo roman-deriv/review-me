@@ -26,7 +26,7 @@ def build_pr_context(pull_request: PullRequest) -> model.PullRequestContextModel
             file.filename: model.FilePatchModel(
                 filename=file.filename,
                 diff=file.patch,
-                hunks=parse_diff(file.patch)
+                hunks=[] if not file.patch else parse_diff(file.patch)
             )
             for file in files
         },
