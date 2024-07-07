@@ -16,6 +16,12 @@ class Side(enum.StrEnum):
     RIGHT = "RIGHT"
 
 
+class Event(enum.StrEnum):
+    APPROVE = "APPROVE"
+    COMMENT = "COMMENT"
+    REQUEST_CHANGES = "REQUEST_CHANGES"
+
+
 class FileReviewRequestModel(BaseModel):
     filename: str
     changes: str
@@ -32,9 +38,18 @@ class CommentModel(BaseModel):
     body: str
     start_line: int | None = None
     end_line: int
-    side: Side | None = None
+    start_side: Side | None = None
     end_side: Side | None = None
     severity: Severity
+
+    def bounds(self) -> tuple[int, int]:
+        if self.start_line:
+            if self.start_line > self.end_line:
+                return self.start_line, self.end_line
+            else:
+                return self.end_line, self.start_line
+        else:
+            return self.end_line, self.end_line
 
 
 class FileReviewResponseModel(BaseModel):
@@ -42,6 +57,6 @@ class FileReviewResponseModel(BaseModel):
 
 
 class ReviewResponseModel(BaseModel):
-    feedback: list[CommentModel]
+    feedback: str
     summary: str
-    event: str
+    event: Event
