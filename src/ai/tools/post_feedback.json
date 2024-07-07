@@ -51,6 +51,18 @@
                 "NO_CHANGE"
               ],
               "description": "CRITICAL items must be addressed. MAJOR items are strongly recommended. OPTIONAL comments are suggestions. MINOR items are personal preferences. NO CHANGE means general feedback with no action needed."
+            },
+            "category": {
+              "type": "string",
+              "enum": [
+                "FUNCTIONALITY",
+                "PERFORMANCE",
+                "SECURITY",
+                "MAINTAINABILITY",
+                "READABILITY",
+                "BEST_PRACTICES"
+              ],
+              "description": "The category of the comment"
             }
           },
           "required": [
@@ -58,7 +70,8 @@
             "start_line",
             "end_line",
             "body",
-            "severity"
+            "severity",
+            "category"
           ]
         }
       }
