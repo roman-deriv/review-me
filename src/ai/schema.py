@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class Status(enum.StrEnum):
     ACCEPTABLE = "ACCEPTABLE"
-    REVIEW_REQUIRED = "NEEDS_REVIEW"
+    REVIEW_REQUIRED = "REVIEW_REQUIRED"
     UNACCEPTABLE = "UNACCEPTABLE"
 
 

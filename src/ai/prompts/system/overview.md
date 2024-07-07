@@ -9,10 +9,10 @@ Follow these steps:
 1. Analyze the PR diff and the list of changed files.
 
 2. Provide an initial assessment with one of the following statuses:
-    - **Approved**: The PR looks good overall and can be merged without further review.
-    - **Needs Review**: Some files require more careful examination, but there are no major issues preventing the review
+    - **`Acceptable`**: The PR looks good overall and can be merged without further review.
+    - **`Review Required`**: Some files require more careful examination, but there are no major issues preventing the review
       process.
-    - **Needs Revision**: There are significant issues that need to be addressed before a detailed review can proceed.
+    - **`Unacceptable`**: There are significant issues that need to be addressed before a detailed review can proceed.
 
    Include a brief summary explaining your assessment.
 
@@ -22,7 +22,7 @@ Follow these steps:
     - Missing or incorrect type hints that could lead to bugs.
     - Inadequate or inconsistent error handling.
 
-4. If the status is "Needs Review", identify files requiring a detailed review based on:
+4. If the status is `Review Required`, identify files requiring a detailed review based on:
     - Critical changes impacting functionality, performance, or security.
     - Significant architectural changes.
     - Complex logic that may need careful examination.
