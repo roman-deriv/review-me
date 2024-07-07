@@ -45,9 +45,9 @@ class CommentModel(BaseModel):
     def bounds(self) -> tuple[int, int]:
         if self.start_line:
             if self.start_line > self.end_line:
-                return self.start_line, self.end_line
-            else:
                 return self.end_line, self.start_line
+            else:
+                return self.start_line, self.end_line
         else:
             return self.end_line, self.end_line
 
