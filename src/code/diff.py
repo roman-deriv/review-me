@@ -1,10 +1,10 @@
 import re
 
 import logger
-import model
+from . import model
 
 
-def parse_diff(patch: str) -> list[model.Hunk]:
+def parse_diff(patch: str) -> list[model.HunkModel]:
     hunks = []
     current_hunk = None
     current_line = 0
@@ -19,7 +19,7 @@ def parse_diff(patch: str) -> list[model.Hunk]:
                 start_line = int(match.group(1))
                 line_count = int(match.group(2))
                 end_line = start_line + line_count - 1
-                current_hunk = model.Hunk(
+                current_hunk = model.HunkModel(
                     start_line=start_line,
                     end_line=end_line,
                     changed_lines=set(),
@@ -41,16 +41,10 @@ def parse_diff(patch: str) -> list[model.Hunk]:
     return hunks
 
 
-def adjust_comment_to_best_hunk(
-        hunks: list[model.Hunk],
-        comment: model.Comment,
-) -> model.Comment | None:
-    comment_start = comment["start_line"]
-    comment_end = comment["end_line"]
-
-    logger.log.debug(f"Comment start line: {comment_start}")
-    logger.log.debug(f"Comment end line: {comment_end}")
-
+def closest_hunk(
+        hunks: list[model.HunkModel],
+        comment: model.GitHubCommentModel,
+) -> model.HunkModel | None:
     best_hunk = None
     best_overlap = 0
     nearest_hunk = None
@@ -60,36 +54,32 @@ def adjust_comment_to_best_hunk(
         if not hunk.changed_lines:
             continue
 
+        distance = hunk.distance(comment)
+
         # Check for overlap with hunk
-        overlap_start = max(comment_start, hunk.start_line)
-        overlap_end = min(comment_end, hunk.end_line)
-        overlap = max(0, overlap_end - overlap_start + 1)
+        if distance < 0:
+            overlap = -distance
+            if overlap > best_overlap:
+                best_overlap = overlap
+                best_hunk = hunk
+                continue
 
-        if overlap > best_overlap:
-            best_overlap = overlap
-            best_hunk = hunk
+        if distance < min_distance:
+            min_distance = distance
+            nearest_hunk = hunk
 
-        # Calculate distance if no overlap
-        if comment_end < hunk.start_line:
-            # Comment is before hunk
-            distance = hunk.start_line - comment_end
-            if distance < min_distance:
-                min_distance = distance
-                nearest_hunk = hunk
-        elif comment_start > hunk.end_line:
-            # Comment is after hunk
-            distance = comment_start - hunk.end_line
-            if distance < min_distance:
-                min_distance = distance
-                nearest_hunk = hunk
+    return best_hunk or nearest_hunk
 
-    if best_hunk:
-        hunk = best_hunk
-    elif nearest_hunk:
-        hunk = nearest_hunk
-    else:
-        # Theoretically, we should never get here...
-        return None  # No suitable hunk found
+
+def adjust_comment_bounds_to_hunk(
+        hunk: model.HunkModel,
+        comment: model.GitHubCommentModel,
+) -> model.GitHubCommentModel | None:
+    comment_start = comment.start_line
+    comment_end = comment.line
+
+    logger.log.debug(f"Comment start line: {comment_start}")
+    logger.log.debug(f"Comment end line: {comment_end}")
 
     # Adjust comment to fit within the hunk while preserving its length
     # Shift the hunk to the first modified line in the hunk
@@ -114,8 +104,11 @@ def adjust_comment_to_best_hunk(
     logger.log.debug(f"Final start line: {adjusted_start}")
     logger.log.debug(f"Final end line: {adjusted_end}")
 
-    return {
-        **comment,
-        "start_line": adjusted_start,
-        "end_line": adjusted_end,
-    }
+    return model.GitHubCommentModel(
+        path=comment.path,
+        body=comment.body,
+        start_line=adjusted_start,
+        line=adjusted_end,
+        start_side=comment.start_side,
+        side=comment.side,
+    )

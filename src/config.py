@@ -1,9 +1,29 @@
+import dataclasses
 import json
 import os
 import sys
 
 import logger
-from model import AppConfig, GitHubConfig, LlmConfig
+
+
+@dataclasses.dataclass
+class GitHubConfig:
+    token: str
+    repository: str
+    pr_number: int
+
+
+@dataclasses.dataclass
+class LlmConfig:
+    strategy: str
+    model: str
+
+
+@dataclasses.dataclass
+class AppConfig:
+    github: GitHubConfig
+    llm: LlmConfig
+    debug: bool = False
 
 
 def from_env() -> AppConfig:

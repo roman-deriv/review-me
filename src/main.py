@@ -5,9 +5,9 @@ import traceback
 import ai.assistant
 import ai.prompt
 import code.pull_request
+import code.review.context
 import config
 import logger
-import review
 from app import App
 
 
@@ -17,12 +17,12 @@ def main():
     logger.log.debug(f"Pull request retrieved: #{pr.number}")
 
     try:
-        code.pull_request.comment(
+        code.pull_request.post_comment(
             pr,
             f'Your review of "{pr.title}" has started.\n'
             f'Your review will be posted shortly.'
         )
-        context = review.build_context(pr)
+        context = code.review.context.build_pr_context(pr)
         logger.log.debug(f"Context built successfully: {context.title}")
         builder = ai.prompt.Builder(context)
         assistant = ai.assistant.Assistant(cfg.llm.model, builder)
@@ -32,7 +32,7 @@ def main():
         asyncio.run(app.run())
     except Exception as e:
         logger.log.error(f"Problem during run: {e}")
-        code.pull_request.comment(
+        code.pull_request.post_comment(
             pr,
             f"Sorry, couldn't review your code because\n"
             f"```{traceback.format_exc()}```"

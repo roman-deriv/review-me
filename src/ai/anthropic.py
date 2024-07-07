@@ -10,7 +10,7 @@ async def chat_completion(
 
     message = await client.messages.create(
         model=model,
-        max_tokens=1000,
+        max_tokens=2000,
         temperature=0,
         system=system_prompt,
         messages=[
@@ -46,7 +46,7 @@ async def tool_completion(
 
     message = await client.messages.create(
         model=model,
-        max_tokens=1000,
+        max_tokens=2000,
         temperature=0,
         system=system_prompt,
         messages=[

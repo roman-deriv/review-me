@@ -3,13 +3,13 @@ import typing
 
 import jinja2
 
-import model
+import code.review.model
 
 PROMPT_DIR = pathlib.Path(__file__).parent / "prompts"
 
 
 class Builder:
-    def __init__(self, context: model.ReviewContext):
+    def __init__(self, context: code.review.model.PullRequestContextModel):
         self._context = context
         self._templates = {
             "system": jinja2.Environment(

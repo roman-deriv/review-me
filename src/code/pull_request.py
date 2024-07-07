@@ -5,7 +5,7 @@ from github.PullRequest import PullRequest
 
 import config
 import logger
-import model
+from .review.model import Feedback
 
 
 def get_pr(cfg: config.GitHubConfig):
@@ -19,7 +19,7 @@ def get_pr(cfg: config.GitHubConfig):
         sys.exit(69)
 
 
-def comment(pull_request: PullRequest, message: str):
+def post_comment(pull_request: PullRequest, message: str):
     try:
         pull_request.create_issue_comment(message)
     except github.GithubException as e:
@@ -28,11 +28,16 @@ def comment(pull_request: PullRequest, message: str):
         logger.log.warning(f"Unknown problem posting comment: {e}")
 
 
-def submit_review(pull_request: PullRequest, feedback: model.Feedback):
+def submit_review(
+        pull_request: PullRequest,
+        feedback: Feedback,
+):
+    comments = [comment.dict(exclude_none=True) for comment in feedback.comments]
+    logger.log.debug(f"Submitting review: {comments}")
     pull_request.create_review(
         body=f"{feedback.summary}\n\n"
              f"{feedback.overall_comment}\n\n"
              f"{feedback.evaluation}",
-        comments=feedback.comments,
+        comments=comments,
         event="COMMENT",
     )

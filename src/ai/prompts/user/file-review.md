@@ -1,12 +1,12 @@
 {% extends 'review-base.md' %}
 
 {% block content -%}
-Original file: {{ review_request.path }}
-Summary of changes in this file: {{ review_request.changes }}
-Changes in related files: {{ review_request.related_changed }}
+Original file: {{ file_context.path }}
+Summary of changes in this file: {{ file_context.changes }}
+Changes in related files: {{ file_context.related_changed }}
 
 Hunks:
-{% for hunk in review_request.hunks -%}
+{% for hunk in file_context.patch.hunks -%}
 Hunk {{ loop.index }}:
     Start Line: {{ hunk.start_line }}
     End Line: {{ hunk.end_line }}
@@ -14,6 +14,6 @@ Hunk {{ loop.index }}:
 ----------
 {%- endfor %}
 
-Diff for file: {{ review_request.path }}
-{{ review_request.diff }}
+Diff for file: {{ file_context.path }}
+{{ file_context.patch.diff }}
 {% endblock %}
