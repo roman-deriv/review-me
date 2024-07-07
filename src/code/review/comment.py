@@ -19,6 +19,7 @@ def extract_comments(
             continue
 
         start_line, end_line = comment.bounds()
+
         code_comment = GitHubCommentModel(
             path=file_context.path,
             body=comment.body,
@@ -34,6 +35,8 @@ def extract_comments(
             continue
 
         adjusted_comment = adjust_comment_bounds_to_hunk(hunk, code_comment)
+        if adjusted_comment.start_line == adjusted_comment.line:
+            adjusted_comment.start_line = None
 
         logger.log.debug(f"File comment ({severity}): {adjusted_comment}")
         filtered_comments.append(adjusted_comment)
