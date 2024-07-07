@@ -1,12 +1,13 @@
 from github.PullRequest import PullRequest
 
-
+import ai.schema
 from . import model
+from ..diff import parse_diff
 
 
-def build(pull_request: PullRequest) -> model.PullRequestContext:
+def build_pr_context(pull_request: PullRequest) -> model.PullRequestContextModel:
     files = pull_request.get_files()
-    context = model.PullRequestContext(
+    context = model.PullRequestContextModel(
         title=pull_request.title,
         description=pull_request.body,
         commit_messages=[
@@ -21,10 +22,11 @@ def build(pull_request: PullRequest) -> model.PullRequestContext:
             comment.body
             for comment in pull_request.get_issue_comments()
         ],
-        diffs={
-            file.filename: model.FileDiffModel(
+        patches={
+            file.filename: model.FilePatchModel(
                 filename=file.filename,
                 diff=file.patch,
+                hunks=parse_diff(file.patch)
             )
             for file in files
         },
@@ -33,3 +35,19 @@ def build(pull_request: PullRequest) -> model.PullRequestContext:
         deleted_files=[file.filename for file in files if file.status == 'removed']
     )
     return context
+
+
+def build_file_contexts(
+        requests: ai.schema.ReviewRequestsResponseModel,
+        context: model.PullRequestContextModel,
+) -> list[model.FileContextModel]:
+    return [
+        model.FileContextModel(
+            path=request.filename,
+            changes=request.changes,
+            related_changes=request.related_changes,
+            reason=request.reason,
+            patch=context.patches[request.filename],
+        )
+        for request in requests.files
+    ]

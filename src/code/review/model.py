@@ -1,24 +1,30 @@
 from pydantic import BaseModel
 
-from ..model import FileDiffModel, HunkModel
+from ..model import FilePatchModel, GitHubCommentModel
 
 
-class PullRequestContext(BaseModel):
+class PullRequestContextModel(BaseModel):
     title: str
     description: str
     commit_messages: list[str]
     issue_comments: list[str]
     review_comments: list[str]
-    diffs: dict[str, FileDiffModel]
+    patches: dict[str, FilePatchModel]
     added_files: list[str]
     modified_files: list[str]
     deleted_files: list[str]
 
 
-class FileContext(BaseModel):
+class FileContextModel(BaseModel):
     path: str
     changes: str
     related_changes: str
     reason: str
-    diff: FileDiffModel
-    hunks: list[HunkModel]
+    patch: FilePatchModel
+
+
+class Feedback(BaseModel):
+    summary: str
+    comments: list[GitHubCommentModel]
+    overall_comment: str
+    evaluation: str
