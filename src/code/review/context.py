@@ -38,7 +38,7 @@ def build_pr_context(pull_request: PullRequest) -> model.PullRequestContextModel
 
 
 def build_file_contexts(
-        requests: ai.schema.ReviewRequestsResponseModel,
+        response: ai.schema.ReviewRequestsResponseModel,
         context: model.PullRequestContextModel,
 ) -> list[model.FileContextModel]:
     return [
@@ -49,5 +49,5 @@ def build_file_contexts(
             reason=request.reason,
             patch=context.patches[request.filename],
         )
-        for request in requests.files
+        for request in response.files
     ]

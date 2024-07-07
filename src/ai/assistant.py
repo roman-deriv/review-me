@@ -17,7 +17,7 @@ class Assistant:
             self,
             context: code.review.model.PullRequestContextModel,
     ) -> list[code.review.model.FileContextModel]:
-        results: schema.ReviewRequestsResponseModel = await tool_completion(
+        completion = await tool_completion(
             system_prompt=self._builder.render_template(
                 name="overview",
                 prefix="system",
@@ -30,9 +30,10 @@ class Assistant:
             tools=[TOOLS["review_files"]],
             tool_override="review_files",
         )
+        response = schema.ReviewRequestsResponseModel(**completion)
 
         return code.review.context.build_file_contexts(
-            requests=results,
+            response=response,
             context=context,
         )
 
@@ -44,7 +45,7 @@ class Assistant:
         logger.log.debug(f"Reviewing file: {context.path}")
         logger.log.debug(f"Hunks: {context.patch.hunks}")
 
-        file_review: schema.FileReviewResponseModel = await tool_completion(
+        completion = await tool_completion(
             system_prompt=self._builder.render_template(
                 name="file-review",
                 prefix="system",
@@ -58,9 +59,10 @@ class Assistant:
             tools=[TOOLS["post_feedback"]],
             tool_override="post_feedback",
         )
+        response = schema.FileReviewResponseModel(**completion)
 
         return code.review.comment.extract_comments(
-            response=file_review,
+            response=response,
             file_context=context,
             severity_limit=severity_limit,
         )
@@ -69,7 +71,7 @@ class Assistant:
             self,
             comments: list[code.model.GitHubCommentModel],
     ) -> code.review.model.Feedback:
-        response: schema.ReviewResponseModel = await tool_completion(
+        completion = await tool_completion(
             system_prompt=self._builder.render_template(
                 name="review-summary",
                 prefix="system",
@@ -83,6 +85,7 @@ class Assistant:
             tools=[TOOLS["submit_review"]],
             tool_override="submit_review",
         )
+        response = schema.ReviewResponseModel(**completion)
 
         return code.review.comment.parse_feedback(
             response=response,
