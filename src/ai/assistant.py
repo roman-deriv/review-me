@@ -1,6 +1,8 @@
-import code.review
+import code.model
+import code.review.comment
+import code.review.context
+import code.review.model
 import logger
-import model
 from . import prompt, schema
 from .anthropic import tool_completion
 from .tool import TOOLS
@@ -13,14 +15,13 @@ class Assistant:
 
     async def request_reviews(
             self,
-            context: model.ReviewContext,
-    ) -> list[model.FileReviewRequest]:
-        system_prompt = self._builder.render_template(
-            name="overview",
-            prefix="system",
-        )
+            context: code.review.model.PullRequestContextModel,
+    ) -> list[code.review.model.FileContextModel]:
         results: schema.ReviewRequestsResponseModel = await tool_completion(
-            system_prompt=system_prompt,
+            system_prompt=self._builder.render_template(
+                name="overview",
+                prefix="system",
+            ),
             prompt=self._builder.render_template(
                 name="overview",
                 prefix="user",
@@ -30,53 +31,49 @@ class Assistant:
             tool_override="review_files",
         )
 
-        return code.review.parse_review_requests(
+        return code.review.context.build_file_contexts(
             requests=results,
             context=context,
         )
 
     async def review_file(
             self,
-            review_request: model.FileReviewRequest,
-            severity_limit: int = model.Severity.OPTIONAL,
-    ) -> list[model.Comment]:
-        logger.log.debug(f"Reviewing file: {review_request.path}")
+            context: code.review.model.FileContextModel,
+            severity_limit: int = code.model.Severity.OPTIONAL,
+    ) -> list[code.model.GitHubCommentModel]:
+        logger.log.debug(f"Reviewing file: {context.path}")
+        logger.log.debug(f"Hunks: {context.patch.hunks}")
 
-        system_prompt = self._builder.render_template(
-            name="file-review",
-            prefix="system",
-        )
-
-        logger.log.debug(f"Hunks: {review_request.hunks}")
-
-        file_review = await tool_completion(
-            system_prompt=system_prompt,
+        file_review: schema.FileReviewResponseModel = await tool_completion(
+            system_prompt=self._builder.render_template(
+                name="file-review",
+                prefix="system",
+            ),
             prompt=self._builder.render_template(
                 name="file-review",
                 prefix="user",
-                review_request=review_request,
+                file_context=context,
             ),
             model=self._model_name,
             tools=[TOOLS["post_feedback"]],
             tool_override="post_feedback",
         )
 
-        return code.review.parse_review(
-            review=file_review,
-            review_request=review_request,
+        return code.review.comment.extract_comments(
+            response=file_review,
+            file_context=context,
             severity_limit=severity_limit,
         )
 
     async def get_feedback(
             self,
-            comments: list[model.Comment],
-    ) -> model.Feedback:
-        system_prompt = self._builder.render_template(
-            name="review-summary",
-            prefix="system",
-        )
-        feedback = await tool_completion(
-            system_prompt=system_prompt,
+            comments: list[code.model.GitHubCommentModel],
+    ) -> code.review.model.Feedback:
+        response: schema.ReviewResponseModel = await tool_completion(
+            system_prompt=self._builder.render_template(
+                name="review-summary",
+                prefix="system",
+            ),
             prompt=self._builder.render_template(
                 name="review-summary",
                 prefix="user",
@@ -87,7 +84,7 @@ class Assistant:
             tool_override="submit_review",
         )
 
-        return code.review.parse_feedback(
-            feedback=feedback,
+        return code.review.comment.parse_feedback(
+            response=response,
             comments=comments,
         )
