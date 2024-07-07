@@ -1,6 +1,5 @@
 import code.model
 import code.review.comment
-import code.review.context
 import code.review.model
 import logger
 from . import prompt, schema
@@ -13,10 +12,10 @@ class Assistant:
         self._model_name = model_name
         self._builder = builder
 
-    async def request_reviews(
+    async def overview(
             self,
-            context: code.review.model.PullRequestContextModel,
-    ) -> list[code.review.model.FileContextModel]:
+            context: code.model.PullRequestContextModel,
+    ) -> code.review.model.OverviewModel:
         completion = await tool_completion(
             system_prompt=self._builder.render_template(
                 name="overview",
@@ -32,13 +31,14 @@ class Assistant:
         )
         response = schema.ReviewRequestsResponseModel(**completion)
 
-        return code.review.context.build_file_contexts(
+        return code.review.comment.parse_overview(
             response=response,
             context=context,
         )
 
     async def review_file(
             self,
+            observations: list[code.review.model.ObservationModel],
             context: code.review.model.FileContextModel,
             severity_limit: int = code.model.Severity.OPTIONAL,
     ) -> list[code.model.GitHubCommentModel]:
@@ -53,6 +53,7 @@ class Assistant:
             prompt=self._builder.render_template(
                 name="file-review",
                 prefix="user",
+                observations=observations,
                 file_context=context,
             ),
             model=self._model_name,
