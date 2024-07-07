@@ -1,65 +1,42 @@
 # Review Me
 
-Get your code reviewed by an LLM.
+## Purpose
+The project aims to streamline the code review process by providing an initial layer of automated,
+high-quality feedback, allowing human reviewers to focus on more complex aspects of the code changes.
 
-## Description
+An automatic code reviewer AI assistant that is deployed as a GitHub action.
+The goal is to provide comprehensive, actionable feedback on pull requests before human reviewers look at the code.
 
-Currently, the script fetches the PR, goes file by file, and makes comments about each one.
+## Process
 
-- I'd like to get more granular and start commenting on individual changes within files as a next step.
-- Eventually, I'd like to get an overall comment that encompasses all the changes to summarize the review.
+The system uses a three-step approach leveraging the Anthropic API:
 
-## Run the Project with Docker
+### Step 1 (Initial Filtering):
 
-1. **Clone the Repository**:
-   ```shell
-   git clone <repository-url>
-   cd <repository-directory>
-   ```
+- Performs an initial assessment of the entire PR diff.
+- Identifies which files need more careful review based on certain criteria.
+- Uses a custom tool (`review_files`) to submit files for detailed review.
 
-2. **Build the Docker Image**:
-   - Ensure you have Docker installed and running on your system.
-   - Build the Docker image using the provided `Dockerfile`:
-     ```shell
-     docker build -t review-me .
-     ```
+### Step 2 (Detailed File Review):
 
-3. **Create and Configure the Environment File**:
-   - Copy the `.env.example` file to `.env` and fill in your credentials:
-     ```shell
-     cp .env.example .env
-     ```
-   - Make sure the `.env` file is in the same directory as the `Dockerfile`.
+- Reviews individual files identified in step 1.
+- Provides specific, actionable comments on code changes.
+- Uses a custom tool (`post_feedback`) to aggregate the comments in preparation for final evaluation.
 
-4. **Run the Docker Container**:
-   - Run the Docker container with the created image:
-     ```shell
-     docker run --env-file .env review-me
-     ```
+### Step 3 (Overall Summary and Evaluation):
 
-## Run the Project Locally (macOS)
+- Synthesizes individual comments into a comprehensive review summary.
+- Determines the final review action (approve, comment, or request changes).
+- Uses a custom tool (`submit_review`) to submit the final evaluation.
 
-- **Clone the Repository**:
-   ```shell
-   git clone <repository-url>
-   cd <repository-directory>
-   ```
-- Create virtual environment (optional, recommended)
-  ```shell
-  python -m venv .venv
-  source .venv/bin/activate
-  ```
-- Install requirements
-  ```shell
-  pip install -r requirements.txt
-  ```
+## Key Goals:
+- Reduce time wasted on trivial fixes during human reviews.
+- Handle multiple programming languages.
+- Provide immediate, actionable feedback to developers.
+- Prioritize valuable, substantive feedback.
 
-- Copy the `.env.example` file to `.env` and fill in your credentials:
-  ```shell
-  cp .env.example .env
-  ```
-
-- Run the entrypoint script
-  ```shell
-  python main.py
-  ```
+## Current Challenges:
+- Ensuring feedback is consistently helpful and relevant.
+- Avoiding comments on issues that are already addressed in the code.
+- Balancing between providing thorough feedback and being concise.
+- Determining the right context needed at each step to ensure a holistic review.
