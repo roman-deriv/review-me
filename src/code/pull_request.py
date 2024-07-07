@@ -66,7 +66,10 @@ def submit_review(
         body: str,
         comments: list[model.GitHubCommentModel] = None
 ):
-    comments = [comment.dict(exclude_none=True) for comment in comments or []]
+    comments = [
+        comment.model_dump(exclude_none=True)
+        for comment in comments or []
+    ]
     logger.log.debug(f"Submitting review: {comments}")
     pull_request.create_review(
         body=body,
