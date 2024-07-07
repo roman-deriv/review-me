@@ -1,7 +1,7 @@
 import unittest
 
-from src.code import diff
-from src.model import Hunk
+import code.model
+from code import diff
 from test import fixture
 
 
@@ -44,63 +44,117 @@ class TestCodeDiff(unittest.TestCase):
 class TestAdjustCommentToBestHunk(unittest.TestCase):
     def setUp(self):
         self.hunks = [
-            Hunk(start_line=5, end_line=10, changed_lines={7, 8}),
-            Hunk(start_line=15, end_line=20, changed_lines={16, 17, 18})
+            code.model.HunkModel(start_line=5, end_line=10, changed_lines={7, 8}),
+            code.model.HunkModel(start_line=15, end_line=20, changed_lines={16, 17, 18})
         ]
 
     def test_comment_within_hunk(self):
-        comment = {"start_line": 7, "end_line": 9}
-        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
-        self.assertEqual(adjusted["start_line"], 7)
-        self.assertEqual(adjusted["end_line"], 8)
+        comment = code.model.GitHubCommentModel(
+            path="test.txt",
+            body="Test comment",
+            start_line=7,
+            line=9,
+        )
+        hunk = diff.closest_hunk(self.hunks, comment)
+        adjusted = diff.adjust_comment_bounds_to_hunk(hunk, comment)
+        self.assertEqual(adjusted.start_line, 7)
+        self.assertEqual(adjusted.line, 8)
 
     def test_comment_between_hunks(self):
-        comment = {"start_line": 12, "end_line": 14}
-        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
-        self.assertEqual(adjusted["start_line"], 16)
-        self.assertEqual(adjusted["end_line"], 18)
+        comment = code.model.GitHubCommentModel(
+            path="test.txt",
+            body="Test comment",
+            start_line=12,
+            line=14,
+        )
+        hunk = diff.closest_hunk(self.hunks, comment)
+        adjusted = diff.adjust_comment_bounds_to_hunk(hunk, comment)
+        self.assertEqual(adjusted.start_line, 16)
+        self.assertEqual(adjusted.line, 18)
 
     def test_comment_after_all_hunks(self):
-        comment = {"start_line": 25, "end_line": 27}
-        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
-        self.assertEqual(adjusted["start_line"], 16)
-        self.assertEqual(adjusted["end_line"], 18)
+        comment = code.model.GitHubCommentModel(
+            path="test.txt",
+            body="Test comment",
+            start_line=25,
+            line=27,
+        )
+        hunk = diff.closest_hunk(self.hunks, comment)
+        adjusted = diff.adjust_comment_bounds_to_hunk(hunk, comment)
+        self.assertEqual(adjusted.start_line, 16)
+        self.assertEqual(adjusted.line, 18)
 
     def test_comment_before_all_hunks(self):
-        comment = {"start_line": 1, "end_line": 3}
-        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
-        self.assertEqual(adjusted["start_line"], 7)
-        self.assertEqual(adjusted["end_line"], 8)
+        comment = code.model.GitHubCommentModel(
+            path="test.txt",
+            body="Test comment",
+            start_line=1,
+            line=3,
+        )
+        hunk = diff.closest_hunk(self.hunks, comment)
+        adjusted = diff.adjust_comment_bounds_to_hunk(hunk, comment)
+        self.assertEqual(adjusted.start_line, 7)
+        self.assertEqual(adjusted.line, 8)
 
     def test_comment_spanning_multiple_hunks(self):
-        comment = {"start_line": 8, "end_line": 17}
-        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
-        self.assertEqual(adjusted["start_line"], 7)
-        self.assertEqual(adjusted["end_line"], 8)
+        comment = code.model.GitHubCommentModel(
+            path="test.txt",
+            body="Test comment",
+            start_line=8,
+            line=17,
+        )
+        hunk = diff.closest_hunk(self.hunks, comment)
+        adjusted = diff.adjust_comment_bounds_to_hunk(hunk, comment)
+        self.assertEqual(adjusted.start_line, 7)
+        self.assertEqual(adjusted.line, 8)
 
     def test_comment_on_unchanged_line_within_hunk(self):
-        comment = {"start_line": 9, "end_line": 9}
-        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
-        self.assertEqual(adjusted["start_line"], 8)
-        self.assertEqual(adjusted["end_line"], 8)
+        comment = code.model.GitHubCommentModel(
+            path="test.txt",
+            body="Test comment",
+            start_line=9,
+            line=9,
+        )
+        hunk = diff.closest_hunk(self.hunks, comment)
+        adjusted = diff.adjust_comment_bounds_to_hunk(hunk, comment)
+        self.assertEqual(adjusted.start_line, 8)
+        self.assertEqual(adjusted.line, 8)
 
     def test_comment_with_single_line(self):
-        comment = {"start_line": 16, "end_line": 16}
-        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
-        self.assertEqual(adjusted["start_line"], 16)
-        self.assertEqual(adjusted["end_line"], 16)
+        comment = code.model.GitHubCommentModel(
+            path="test.txt",
+            body="Test comment",
+            start_line=16,
+            line=16,
+        )
+        hunk = diff.closest_hunk(self.hunks, comment)
+        adjusted = diff.adjust_comment_bounds_to_hunk(hunk, comment)
+        self.assertEqual(adjusted.start_line, 16)
+        self.assertEqual(adjusted.line, 16)
 
     def test_comment_with_no_overlap_closer_to_second_hunk(self):
-        comment = {"start_line": 13, "end_line": 14}
-        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
-        self.assertEqual(adjusted["start_line"], 16)
-        self.assertEqual(adjusted["end_line"], 17)
+        comment = code.model.GitHubCommentModel(
+            path="test.txt",
+            body="Test comment",
+            start_line=13,
+            line=14,
+        )
+        hunk = diff.closest_hunk(self.hunks, comment)
+        adjusted = diff.adjust_comment_bounds_to_hunk(hunk, comment)
+        self.assertEqual(adjusted.start_line, 16)
+        self.assertEqual(adjusted.line, 17)
 
     def test_comment_with_partial_overlap(self):
-        comment = {"start_line": 9, "end_line": 11}
-        adjusted = diff.adjust_comment_to_best_hunk(self.hunks, comment)
-        self.assertEqual(adjusted["start_line"], 7)
-        self.assertEqual(adjusted["end_line"], 8)
+        comment = code.model.GitHubCommentModel(
+            path="test.txt",
+            body="Test comment",
+            start_line=9,
+            line=11,
+        )
+        hunk = diff.closest_hunk(self.hunks, comment)
+        adjusted = diff.adjust_comment_bounds_to_hunk(hunk, comment)
+        self.assertEqual(adjusted.start_line, 7)
+        self.assertEqual(adjusted.line, 8)
 
 
 if __name__ == '__main__':
