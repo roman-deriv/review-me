@@ -46,7 +46,7 @@ class App:
         return [
             comment
             for file_comments in await asyncio.gather(*[
-                asyncio.create_task(self._review_file(context, delay=i * 3.5))
+                asyncio.create_task(self._review_file(context, delay=i * 5))
                 for i, context in enumerate(contexts)
             ])
             for comment in file_comments
