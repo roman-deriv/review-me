@@ -1,11 +1,4 @@
-Get your code reviewed by an LLM.
-
-## Description
-
-Currently, the script fetches the PR, goes file by file, and makes comments about each one.
-
-- I'd like to get more granular and start commenting on individual changes within files as a next step.
-- Eventually, I'd like to get an overall comment that encompasses all the changes to summarize the review.
+# Development Guide
 
 ## Run the Project with Docker
 
