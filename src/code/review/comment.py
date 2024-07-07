@@ -12,13 +12,13 @@ def parse_overview(
 ) -> model.OverviewModel:
     return model.OverviewModel(
         initial_assessment=model.InitialAssessmentModel(
-            status=response.initial_assessment.status,
+            status=model.Status[response.initial_assessment.status],
             summary=response.initial_assessment.summary,
         ),
         observations=[
             model.ObservationModel(
                 comment=observation.comment,
-                tag=observation.tag
+                tag=model.ObservationTag[observation.tag],
             )
             for observation in response.observations or []
         ],
@@ -30,7 +30,7 @@ def parse_overview(
                 reason=request.reason,
                 patch=context.patches[request.filename],
             )
-            for request in response.files_for_review
+            for request in response.files_for_review or []
         ],
     )
 

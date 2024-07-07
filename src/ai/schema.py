@@ -34,10 +34,10 @@ class InitialAssessmentModel(BaseModel):
 
 
 class ObservationTag(enum.StrEnum):
-    DOCUMENTATION = "documentation"
-    CODE_STYLE = "code-style"
-    TYPE_CHECKING = "type-checking"
-    ERROR_HANDLING = "error-handling"
+    DOCUMENTATION = "DOCUMENTATION"
+    CODE_STYLE = "CODE_STYLE"
+    TYPE_CHECKING = "TYPE_CHECKING"
+    ERROR_HANDLING = "ERROR_HANDLING"
 
 
 class ObservationModel(BaseModel):
