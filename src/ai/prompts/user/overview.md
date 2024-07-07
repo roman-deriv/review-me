@@ -23,7 +23,7 @@ Files Modified:
 {% endif %} 
 
 Changes:
-{%- for filename, diff in context.patches.items() -%}
+{%- for filename, patch in context.patches.items() -%}
 Diff for file: {{filename}}
 {{ patch.diff }}
 {%- endfor %}
