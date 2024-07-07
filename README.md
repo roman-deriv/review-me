@@ -40,6 +40,14 @@ The system employs a three-step approach leveraging the Anthropic API:
 - Determines the final review action (approve, comment, or request changes)
 - Uses a custom `submit_review` tool to submit the final evaluation
 
+## Usage
+
+[Provide usage instructions, including how to set up the GitHub action]
+
+## Configuration
+
+[Explain how to configure the tool, including any customizable options]
+
 ## Key Goals
 
 1. Enhance code quality through consistent, thorough reviews
@@ -55,13 +63,23 @@ The system employs a three-step approach leveraging the Anthropic API:
 - Balancing thorough feedback with conciseness
 - Determining optimal context needed at each step for holistic review
 
-## Usage
+## Future Work
 
-[Provide usage instructions, including how to set up the GitHub action]
+### Near-term
+- 
+- Allow users to define custom review rules and priorities
+- Implement a feedback loop to improve review quality based on user interactions
+- Enhance the AI's ability to understand relationships between different files in a PR
+- Provide insights on architectural impacts of changes
 
-## Configuration
+### Long-term
 
-[Explain how to configure the tool, including any customizable options]
+- Offer AI-generated code suggestions to address identified issues
+- Develop capabilities to suggest refactoring strategies for complex code 
+- Implement automated documentation updates based on code modifications
+- Explore capabilities for generating unit tests based on code changes
+- Develop a dashboard for tracking review statistics and trends
+- Implement a chat-like interface for developers to ask questions about the review
 
 ## Contributing
 
