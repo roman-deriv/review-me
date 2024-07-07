@@ -14,6 +14,13 @@ Hunk {{ loop.index }}:
 ----------
 {%- endfor %}
 
+> **NOTE**: We are already aware of the following observations.
+> Do not make any comments related to the issues.
+> Keep your comments focused on specific, actionable items related to the implementation details.
+{% for observation in observations -%}
+- [{{ observation.tag }}] {{ observation.comment }}:
+{%- endfor %}
+
 Diff for file: {{ file_context.path }}
 {{ file_context.patch.diff }}
 {% endblock %}
