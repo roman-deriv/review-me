@@ -68,15 +68,13 @@ class FilePatchModel(BaseModel):
     hunks: list[HunkModel]
 
 
-class CommentBoundsModel(BaseModel):
-    start_line: int
-    start_side: Side | None = None
-    end_line: int
-    end_side: Side | None = None
-
-
-class CommentModel(BaseModel):
-    filename: str
-    bounds: CommentBoundsModel
-    body: str
-    severity: Severity
+class PullRequestContextModel(BaseModel):
+    title: str
+    description: str
+    commit_messages: list[str]
+    issue_comments: list[str]
+    review_comments: list[str]
+    patches: dict[str, FilePatchModel]
+    added_files: list[str]
+    modified_files: list[str]
+    deleted_files: list[str]
