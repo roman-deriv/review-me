@@ -66,7 +66,7 @@ The system employs a three-step approach leveraging the Anthropic API:
 ## Future Work
 
 ### Near-term
-- 
+
 - Allow users to define custom review rules and priorities
 - Implement a feedback loop to improve review quality based on user interactions
 - Enhance the AI's ability to understand relationships between different files in a PR
