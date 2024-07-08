@@ -1,6 +1,7 @@
 import code.model
 import code.review.comment
 import code.review.model
+import config
 import logger
 from . import prompt, schema
 from .anthropic import tool_completion
@@ -8,11 +9,11 @@ from .tool import TOOLS
 
 
 class Assistant:
-    def __init__(self, model_name: str, builder: prompt.Builder):
-        self._model_name = model_name
+    def __init__(self, llm_config: config.LlmConfig, builder: prompt.Builder):
+        self._model_name = llm_config.model
         self._builder = builder
         self._persona = self._builder.render_template(
-            name="pirate",
+            name=llm_config.persona,
             prefix="persona",
         )
 

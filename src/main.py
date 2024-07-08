@@ -24,7 +24,7 @@ def main():
         context = code.pull_request.build_pr_context(pr)
         logger.log.debug(f"Context built successfully: {context.title}")
         builder = ai.prompt.Builder(context)
-        assistant = ai.assistant.Assistant(cfg.llm.model, builder)
+        assistant = ai.assistant.Assistant(cfg.llm, builder)
 
         app = App(pr, context, assistant, debug=cfg.debug)
 
