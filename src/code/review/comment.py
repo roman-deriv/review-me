@@ -53,14 +53,14 @@ def prioritize_comments(
     ]
 
     for category in prioritized_categories:
-        prioritized_comments += comments[category]
+        prioritized_comments += comments.get(category, [])
 
     for category in remaining_categories:
         if len(prioritized_comments) == 0:
-            prioritized_comments += comments[category][:2]
-            remaining_comments += comments[category][2:]
+            prioritized_comments += comments.get(category, [])[:2]
+            remaining_comments += comments.get(category, [])[2:]
         else:
-            remaining_comments += comments[category]
+            remaining_comments += comments.get(category, [])
 
     return prioritized_comments, remaining_comments
 
@@ -116,4 +116,5 @@ def parse_feedback(
         comments=comments,
         overall_comment=response.feedback,
         evaluation=response.event,
+        justification=response.justification,
     )
