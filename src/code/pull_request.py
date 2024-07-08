@@ -24,7 +24,7 @@ def build_pr_context(pull_request: PullRequest) -> model.PullRequestContextModel
     files = pull_request.get_files()
     context = model.PullRequestContextModel(
         title=pull_request.title,
-        description=pull_request.body,
+        description=pull_request.body or "",
         commit_messages=[
             commit.commit.message for commit in pull_request.get_commits()
         ],
