@@ -21,6 +21,14 @@ jobs:
           ref: refs/pull/${{ github.event.issue.number }}/merge
           fetch-depth: 0
 
+      - name: Debug Context
+        run: |
+          echo "Issue Number: ${{ github.event.issue.number }}"
+          echo "Comment Body: ${{ github.event.comment.body }}"
+          echo "Is Pull Request: ${{ github.event.issue.pull_request }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Repository Owner: ${{ github.repository_owner }}"
+
       - name: Post "Review in Progress" Comment
         uses: peter-evans/create-or-update-comment@v1
         with:
