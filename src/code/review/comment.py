@@ -88,7 +88,7 @@ def extract_comments(
             start_side=comment.start_side,
         )
 
-        hunk = closest_hunk(file_context.patch.hunks, code_comment)
+        hunk = closest_hunk(file_context.patch.hunks, (start_line, end_line))
         if not hunk:
             logger.log.debug(f"No suitable hunk for comment: {comment}")
             continue

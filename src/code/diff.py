@@ -43,8 +43,9 @@ def parse_diff(patch: str) -> list[model.HunkModel]:
 
 def closest_hunk(
     hunks: list[model.HunkModel],
-    comment: model.GitHubCommentModel,
+    bounds: tuple[int, int],
 ) -> model.HunkModel | None:
+    start_line, end_line = bounds
     best_hunk = None
     best_overlap = 0
     nearest_hunk = None
@@ -54,7 +55,7 @@ def closest_hunk(
         if not hunk.changed_lines:
             continue
 
-        distance = hunk.distance(comment)
+        distance = hunk.distance(start_line, end_line)
 
         # Check for overlap with hunk
         if distance < 0:
