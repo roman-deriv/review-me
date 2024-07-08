@@ -4,10 +4,6 @@
   "input_schema": {
     "type": "object",
     "properties": {
-      "summary": {
-        "type": "string",
-        "description": "Comprehensive summary of the review, including key findings, patterns, and recommendations"
-      },
       "feedback": {
         "type": "string",
         "description": "Constructive feedback and specific suggestions for improvement"
@@ -20,12 +16,16 @@
           "REQUEST_CHANGES"
         ],
         "description": "The final review action to take"
+      },
+      "justification": {
+        "type": "string",
+        "description": "The rationale use to determine the final evaluation"
       }
     },
     "required": [
-      "summary",
       "feedback",
-      "event"
+      "event",
+      "justification"
     ]
   }
 }

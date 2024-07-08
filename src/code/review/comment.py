@@ -3,7 +3,7 @@ import ai.schema
 import logger
 from . import model
 from ..diff import adjust_comment_bounds_to_hunk, closest_hunk
-from ..model import GitHubCommentModel, PullRequestContextModel, Severity
+from ..model import Category, GitHubCommentModel, PullRequestContextModel, Severity
 
 
 def parse_overview(
@@ -35,12 +35,42 @@ def parse_overview(
     )
 
 
+def prioritize_comments(
+        comments: dict[Category, list[GitHubCommentModel]],
+) -> tuple[list[GitHubCommentModel], list[GitHubCommentModel]]:
+    prioritized_comments = []
+    remaining_comments = []
+
+    prioritized_categories = [
+        Category.FUNCTIONALITY,
+        Category.PERFORMANCE,
+        Category.SECURITY,
+    ]
+    remaining_categories = [
+        Category.MAINTAINABILITY,
+        Category.READABILITY,
+        Category.BEST_PRACTICES,
+    ]
+
+    for category in prioritized_categories:
+        prioritized_comments += comments.get(category, [])
+
+    for category in remaining_categories:
+        if len(prioritized_comments) == 0:
+            prioritized_comments += comments.get(category, [])[:2]
+            remaining_comments += comments.get(category, [])[2:]
+        else:
+            remaining_comments += comments.get(category, [])
+
+    return prioritized_comments, remaining_comments
+
+
 def extract_comments(
         response: ai.schema.FileReviewResponseModel,
         file_context: model.FileContextModel,
         severity_limit: int,
-) -> list[GitHubCommentModel]:
-    filtered_comments = []
+) -> tuple[list[GitHubCommentModel], list[GitHubCommentModel]]:
+    filtered_comments = {}
     for comment in response.feedback:
         severity = Severity.from_string(comment.severity)
         if severity > severity_limit:
@@ -68,11 +98,14 @@ def extract_comments(
             adjusted_comment.start_line = None
 
         logger.log.debug(f"File comment ({severity}): {adjusted_comment}")
-        filtered_comments.append(adjusted_comment)
+
+        if comment.category not in filtered_comments:
+            filtered_comments[Category[comment.category]] = []
+        filtered_comments[Category[comment.category]].append(adjusted_comment)
 
     logger.log.debug(f"Finished file review for `{file_context.path}`")
 
-    return filtered_comments
+    return prioritize_comments(filtered_comments)
 
 
 def parse_feedback(
@@ -81,7 +114,7 @@ def parse_feedback(
 ) -> model.Feedback:
     return model.Feedback(
         comments=comments,
-        summary=response.summary,
         overall_comment=response.feedback,
         evaluation=response.event,
+        justification=response.justification,
     )

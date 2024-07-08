@@ -43,7 +43,7 @@ class OverviewModel(BaseModel):
 
 
 class Feedback(BaseModel):
-    summary: str
     comments: list[GitHubCommentModel]
     overall_comment: str
     evaluation: str
+    justification: str

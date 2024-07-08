@@ -17,6 +17,15 @@ class Severity(enum.IntEnum):
         return cls[s.upper()]
 
 
+class Category(enum.StrEnum):
+    FUNCTIONALITY = "FUNCTIONALITY"
+    PERFORMANCE = "PERFORMANCE"
+    SECURITY = "SECURITY"
+    MAINTAINABILITY = "MAINTAINABILITY"
+    READABILITY = "READABILITY"
+    BEST_PRACTICES = "BEST_PRACTICES"
+
+
 class GitHubCommentModel(BaseModel):
     path: str
     body: str
