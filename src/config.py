@@ -17,6 +17,7 @@ class GitHubConfig:
 class LlmConfig:
     strategy: str
     model: str
+    persona: str
 
 
 @dataclasses.dataclass
@@ -36,6 +37,7 @@ def from_env() -> AppConfig:
 
         strategy = os.environ.get("LLM_STRATEGY", "anthropic")
         model = os.environ.get("MODEL")
+        persona = os.environ.get("PERSONA", "pirate")
 
         with open(event_path, "r") as f:
             event = json.load(f)
@@ -51,6 +53,7 @@ def from_env() -> AppConfig:
             llm=LlmConfig(
                 strategy=strategy,
                 model=model,
+                persona=persona,
             ),
             debug=debug,
         )

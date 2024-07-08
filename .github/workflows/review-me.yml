@@ -13,6 +13,8 @@ jobs:
   review:
     if: github.event.issue.pull_request && github.event.comment.body == '/review-me'
     runs-on: ubuntu-latest
+    env:
+      PERSONA: ${{ vars.MY_VARIABLE }}
     steps:
       - uses: actions/checkout@v4
         with:
