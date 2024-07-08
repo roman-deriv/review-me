@@ -41,7 +41,10 @@ class Assistant:
             observations: list[code.review.model.ObservationModel],
             context: code.review.model.FileContextModel,
             severity_limit: int = code.model.Severity.OPTIONAL,
-    ) -> list[code.model.GitHubCommentModel]:
+    ) -> tuple[
+        list[code.model.GitHubCommentModel],
+        list[code.model.GitHubCommentModel]
+    ]:
         logger.log.debug(f"Reviewing file: {context.path}")
         logger.log.debug(f"Hunks: {context.patch.hunks}")
 
@@ -70,7 +73,8 @@ class Assistant:
 
     async def get_feedback(
             self,
-            comments: list[code.model.GitHubCommentModel],
+            prioritized_comments: list[code.model.GitHubCommentModel],
+            remaining_comments: list[code.model.GitHubCommentModel],
     ) -> code.review.model.Feedback:
         completion = await tool_completion(
             system_prompt=self._builder.render_template(
@@ -80,7 +84,8 @@ class Assistant:
             prompt=self._builder.render_template(
                 name="review-summary",
                 prefix="user",
-                comments=comments,
+                prioritized_comments=prioritized_comments,
+                comments=remaining_comments,
             ),
             model=self._model_name,
             tools=[TOOLS["submit_review"]],
@@ -90,5 +95,5 @@ class Assistant:
 
         return code.review.comment.parse_feedback(
             response=response,
-            comments=comments,
+            comments=prioritized_comments,
         )
