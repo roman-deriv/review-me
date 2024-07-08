@@ -70,7 +70,7 @@ def extract_comments(
     file_context: model.FileContextModel,
     severity_limit: int,
 ) -> tuple[list[GitHubCommentModel], list[GitHubCommentModel]]:
-    filtered_comments = {}
+    filtered_comments: dict[Category, list[GitHubCommentModel]] = {}
     for comment in response.feedback:
         severity = Severity.from_string(comment.severity)
         if severity > severity_limit:
@@ -78,6 +78,17 @@ def extract_comments(
             continue
 
         start_line, end_line = comment.bounds()
+
+        hunk = closest_hunk(file_context.patch.hunks, (start_line, end_line))
+        if not hunk:
+            logger.log.debug(f"No suitable hunk for comment: {comment}")
+            continue
+
+        adjusted_start, adjusted_end = adjust_comment_bounds_to_hunk(
+            hunk=hunk,
+            start_line=start_line,
+            end_line=end_line,
+        )
 
         code_comment = GitHubCommentModel(
             path=file_context.path,
@@ -88,20 +99,17 @@ def extract_comments(
             start_side=comment.start_side,
         )
 
-        hunk = closest_hunk(file_context.patch.hunks, code_comment)
-        if not hunk:
-            logger.log.debug(f"No suitable hunk for comment: {comment}")
-            continue
+        code_comment.start_line = adjusted_start
+        code_comment.line = adjusted_end
+        if adjusted_start == adjusted_end:
+            code_comment.start_line = None
 
-        adjusted_comment = adjust_comment_bounds_to_hunk(hunk, code_comment)
-        if adjusted_comment.start_line == adjusted_comment.line:
-            adjusted_comment.start_line = None
+        logger.log.debug(f"File comment ({severity}): {code_comment}")
 
-        logger.log.debug(f"File comment ({severity}): {adjusted_comment}")
-
+        category = Category[comment.category]
         if comment.category not in filtered_comments:
-            filtered_comments[Category[comment.category]] = []
-        filtered_comments[Category[comment.category]].append(adjusted_comment)
+            filtered_comments[category] = []
+        filtered_comments[category].append(code_comment)
 
     logger.log.debug(f"Finished file review for `{file_context.path}`")
 

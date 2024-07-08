@@ -43,10 +43,11 @@ def parse_diff(patch: str) -> list[model.HunkModel]:
 
 def closest_hunk(
     hunks: list[model.HunkModel],
-    comment: model.GitHubCommentModel,
+    bounds: tuple[int, int],
 ) -> model.HunkModel | None:
+    start_line, end_line = bounds
     best_hunk = None
-    best_overlap = 0
+    best_overlap = 0.0
     nearest_hunk = None
     min_distance = float("inf")
 
@@ -54,7 +55,7 @@ def closest_hunk(
         if not hunk.changed_lines:
             continue
 
-        distance = hunk.distance(comment)
+        distance = hunk.distance(start_line, end_line)
 
         # Check for overlap with hunk
         if distance < 0:
@@ -73,18 +74,16 @@ def closest_hunk(
 
 def adjust_comment_bounds_to_hunk(
     hunk: model.HunkModel,
-    comment: model.GitHubCommentModel,
-) -> model.GitHubCommentModel | None:
-    comment_start = comment.start_line
-    comment_end = comment.line
-
-    logger.log.debug(f"Comment start line: {comment_start}")
-    logger.log.debug(f"Comment end line: {comment_end}")
+    start_line: int,
+    end_line: int,
+) -> tuple[int, int]:
+    logger.log.debug(f"Comment start line: {start_line}")
+    logger.log.debug(f"Comment end line: {end_line}")
 
     # Adjust comment to fit within the hunk while preserving its length
     # Shift the hunk to the first modified line in the hunk
-    comment_length = comment_end - comment_start
-    adjusted_start = max(comment_start, min(hunk.changed_lines))
+    comment_length = end_line - start_line
+    adjusted_start = max(start_line, min(hunk.changed_lines))
     adjusted_end = adjusted_start + comment_length
 
     logger.log.debug(f"Shifted start line: {adjusted_start}")
@@ -104,11 +103,4 @@ def adjust_comment_bounds_to_hunk(
     logger.log.debug(f"Final start line: {adjusted_start}")
     logger.log.debug(f"Final end line: {adjusted_end}")
 
-    return model.GitHubCommentModel(
-        path=comment.path,
-        body=comment.body,
-        start_line=adjusted_start,
-        line=adjusted_end,
-        start_side=comment.start_side,
-        side=comment.side,
-    )
+    return adjusted_start, adjusted_end

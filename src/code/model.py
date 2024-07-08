@@ -49,24 +49,24 @@ class HunkModel(BaseModel):
     def nearest_change(self, line: int) -> int:
         return min(self.changed_lines, key=lambda x: abs(x - line))
 
-    def overlap(self, comment: GitHubCommentModel):
-        overlap_start = max(comment.start_line, self.start_line)
-        overlap_end = min(comment.line, self.end_line)
+    def overlap(self, start_line: int, end_line: int) -> int:
+        overlap_start = max(start_line, self.start_line)
+        overlap_end = min(end_line, self.end_line)
         return max(0, overlap_end - overlap_start + 1)
 
-    def distance(self, comment: GitHubCommentModel) -> float:
-        if comment.line < self.start_line:
+    def distance(self, start_line: int, end_line: int) -> float:
+        if end_line < self.start_line:
             # Comment is before hunk
-            return self.start_line - comment.line
-        elif comment.start_line > self.end_line:
+            return self.start_line - end_line
+        elif start_line > self.end_line:
             # Comment is after hunk
-            return comment.start_line - self.end_line
+            return start_line - self.end_line
         elif (
-            self.start_line <= comment.line <= self.end_line
-            or self.start_line <= comment.start_line <= self.end_line
+            self.start_line <= end_line <= self.end_line
+            or self.start_line <= start_line <= self.end_line
         ):
             # Comment overlaps hunk (negative distance)
-            return -self.overlap(comment)
+            return -self.overlap(start_line, end_line)
 
         return float("inf")
 

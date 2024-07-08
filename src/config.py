@@ -31,12 +31,12 @@ def from_env() -> AppConfig:
     try:
         debug = bool(os.environ.get("DEBUG", False))
 
-        github_token = os.environ.get("GITHUB_TOKEN")
-        repository = os.environ.get("GITHUB_REPOSITORY")
-        event_path = os.environ.get("GITHUB_EVENT_PATH")
+        github_token = os.environ["GITHUB_TOKEN"]
+        repository = os.environ["GITHUB_REPOSITORY"]
+        event_path = os.environ["GITHUB_EVENT_PATH"]
 
         strategy = os.environ.get("LLM_STRATEGY", "anthropic")
-        model = os.environ.get("MODEL")
+        model = os.environ.get("MODEL", "claude-3-5-sonnet-20240620")
         persona = os.environ.get("PERSONA", "pirate")
 
         with open(event_path, "r") as f:
