@@ -19,7 +19,8 @@ def main():
         code.pull_request.post_comment(
             pr,
             f'Your review of "{pr.title}" has started.\n'
-            f"Your review will be posted shortly.",
+            f"Your review will be posted shortly.\n"
+            "This comment is from main.py",
         )
         context = code.pull_request.build_pr_context(pr)
         logger.log.debug(f"Context built successfully: {context.title}")
