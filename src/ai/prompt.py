@@ -18,6 +18,9 @@ class Builder:
             ),
             "user": jinja2.Environment(
                 loader=jinja2.FileSystemLoader(PROMPT_DIR / "user"),
+            ),
+            "persona": jinja2.Environment(
+                loader=jinja2.FileSystemLoader(PROMPT_DIR / "persona"),
             )
         }
 
