@@ -1,13 +1,12 @@
 import asyncio
-
-from github.PullRequest import PullRequest
-
-import ai.assistant
-import ai.tool
 import code.model
 import code.pull_request
 import code.review.model
+
+import ai.assistant
+import ai.tool
 import logger
+from github.PullRequest import PullRequest
 
 
 class App:
