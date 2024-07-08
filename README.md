@@ -42,11 +42,77 @@ The system employs a three-step approach leveraging the Anthropic API:
 
 ## Usage
 
-[Provide usage instructions, including how to set up the GitHub action]
+To use Review Me in your GitHub repository, follow these steps:
+
+1. Add the Review Me action to your repository's workflow file (e.g., `.github/workflows/review-me.yml`).
+2. Set up the necessary secrets and variables in your repository settings.
+3. Trigger the review by commenting `/review-me` on a pull request.
+
+### Prerequisites
+
+- An Anthropic API key (Claude model access required)
+
+### Setup
+
+1. Add an `ANTHROPIC_API_KEY` to your repository secrets.
+2. (Optional) Specify a persona as a repository variable named `PERSONA`.
+
+### Example Action Definition
+
+Create or update the file `.github/workflows/review-me.yml` in your repository with the following content:
+
+```yaml
+name: LLM Code Review
+
+on:
+  issue_comment:
+    types: [ created ]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  review:
+    if: github.event.issue.pull_request && github.event.comment.body == '/review-me'
+    runs-on: ubuntu-latest
+    env:
+      PERSONA: ${{ vars.PERSONA }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/merge
+          fetch-depth: 0
+
+      - name: LLM Code Review
+        uses: FyZyX/review-me@v1
+        with:
+          github_token: ${{ github.token }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
+### Triggering a Review
+
+To trigger a review on a pull request:
+
+1. Open the pull request you want to review.
+2. Add a comment with the text `/review-me`.
+3. The action will run automatically, and the AI will submit its review to pull request once complete.
 
 ## Configuration
 
-[Explain how to configure the tool, including any customizable options]
+Review Me offers several configuration options to customize its behavior.
+These can be set as inputs in your workflow file or as repository variables/secrets.
+
+### Repository Variables
+
+- `PERSONA`: Set this to choose a specific reviewer persona.
+  Available options can be found in the [`persona` prompts](./src/ai/prompts/persona).
+
+### Repository Secrets
+
+- `ANTHROPIC_API_KEY`: Your Anthropic API key for accessing the Claude model.
 
 ## Key Goals
 
