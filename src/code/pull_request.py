@@ -59,7 +59,7 @@ def post_comment(pull_request: PullRequest, message: str):
 def submit_review(
     pull_request: PullRequest,
     body: str,
-    comments: list[model.GitHubCommentModel] = None,
+    comments: list[model.GitHubCommentModel] | None = None,
 ):
     comments = [comment.model_dump(exclude_none=True) for comment in comments or []]
     logger.log.debug(f"Submitting review: {comments}")
