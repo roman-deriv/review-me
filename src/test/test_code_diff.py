@@ -18,11 +18,11 @@ class TestCodeDiff(unittest.TestCase):
         patch = fixture.load_fixture("modified-file-patch.md")
         hunks = diff.parse_diff(patch)
         self.assertEqual(len(hunks), 2)
-        
+
         self.assertEqual(hunks[0].start_line, 6)
         self.assertEqual(hunks[0].end_line, 23)
         self.assertEqual(hunks[0].changed_lines, {9, 12, 13, 19, 20})
-        
+
         self.assertEqual(hunks[1].start_line, 26)
         self.assertEqual(hunks[1].end_line, 33)
         self.assertEqual(hunks[1].changed_lines, {29, 30})
@@ -45,7 +45,9 @@ class TestAdjustCommentToBestHunk(unittest.TestCase):
     def setUp(self):
         self.hunks = [
             code.model.HunkModel(start_line=5, end_line=10, changed_lines={7, 8}),
-            code.model.HunkModel(start_line=15, end_line=20, changed_lines={16, 17, 18})
+            code.model.HunkModel(
+                start_line=15, end_line=20, changed_lines={16, 17, 18}
+            ),
         ]
 
     def test_comment_within_hunk(self):
@@ -157,5 +159,5 @@ class TestAdjustCommentToBestHunk(unittest.TestCase):
         self.assertEqual(adjusted.line, 8)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

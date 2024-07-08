@@ -3,7 +3,7 @@
 {% block content -%}
 ## Prioritized Feedback
 
-These comments will be posted as individual review comments, 
+These comments will be posted as individual review comments,
 they are just here for reference and context.
 
 {% for comment in prioritized_comments -%}

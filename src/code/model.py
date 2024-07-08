@@ -62,8 +62,8 @@ class HunkModel(BaseModel):
             # Comment is after hunk
             return comment.start_line - self.end_line
         elif (
-                self.start_line <= comment.line <= self.end_line or
-                self.start_line <= comment.start_line <= self.end_line
+            self.start_line <= comment.line <= self.end_line
+            or self.start_line <= comment.start_line <= self.end_line
         ):
             # Comment overlaps hunk (negative distance)
             return -self.overlap(comment)

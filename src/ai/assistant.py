@@ -18,8 +18,8 @@ class Assistant:
         )
 
     async def overview(
-            self,
-            context: code.model.PullRequestContextModel,
+        self,
+        context: code.model.PullRequestContextModel,
     ) -> code.review.model.OverviewModel:
         completion = await tool_completion(
             system_prompt=self._builder.render_template(
@@ -43,13 +43,12 @@ class Assistant:
         )
 
     async def review_file(
-            self,
-            observations: list[code.review.model.ObservationModel],
-            context: code.review.model.FileContextModel,
-            severity_limit: int = code.model.Severity.OPTIONAL,
+        self,
+        observations: list[code.review.model.ObservationModel],
+        context: code.review.model.FileContextModel,
+        severity_limit: int = code.model.Severity.OPTIONAL,
     ) -> tuple[
-        list[code.model.GitHubCommentModel],
-        list[code.model.GitHubCommentModel]
+        list[code.model.GitHubCommentModel], list[code.model.GitHubCommentModel]
     ]:
         logger.log.debug(f"Reviewing file: {context.path}")
         logger.log.debug(f"Hunks: {context.patch.hunks}")
@@ -79,9 +78,9 @@ class Assistant:
         )
 
     async def get_feedback(
-            self,
-            prioritized_comments: list[code.model.GitHubCommentModel],
-            remaining_comments: list[code.model.GitHubCommentModel],
+        self,
+        prioritized_comments: list[code.model.GitHubCommentModel],
+        remaining_comments: list[code.model.GitHubCommentModel],
     ) -> code.review.model.Feedback:
         completion = await tool_completion(
             system_prompt=self._builder.render_template(

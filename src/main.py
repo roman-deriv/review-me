@@ -19,7 +19,7 @@ def main():
         code.pull_request.post_comment(
             pr,
             f'Your review of "{pr.title}" has started.\n'
-            f'Your review will be posted shortly.'
+            f"Your review will be posted shortly.",
         )
         context = code.pull_request.build_pr_context(pr)
         logger.log.debug(f"Context built successfully: {context.title}")
@@ -34,7 +34,7 @@ def main():
         code.pull_request.post_comment(
             pr,
             f"Sorry, couldn't review your code because\n"
-            f"```{traceback.format_exc()}```"
+            f"```{traceback.format_exc()}```",
         )
         sys.exit(42)
 

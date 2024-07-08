@@ -14,7 +14,6 @@ import code.review.model
 
 
 class TestReview(unittest.TestCase):
-
     def setUp(self):
         self.mock_pr = Mock(spec=PullRequest)
         self.mock_pr.title = "Test PR"
@@ -47,23 +46,26 @@ class TestReview(unittest.TestCase):
         self.assertListEqual(context.commit_messages, ["Test commit"])
         self.assertListEqual(context.review_comments, ["Test review comment"])
         self.assertListEqual(context.issue_comments, ["Test issue comment"])
-        self.assertEqual(context.patches, {
-            "test.py": code.model.FilePatchModel(
-                filename="test.py",
-                diff="@@ -1,3 +1,4 @@\n Line 1\n+Line 2\n Line 3\n Line 4",
-                hunks=[
-                    code.model.HunkModel(
-                        start_line=1,
-                        end_line=4,
-                        changed_lines={2},
-                    ),
-                ],
-            )
-        })
+        self.assertEqual(
+            context.patches,
+            {
+                "test.py": code.model.FilePatchModel(
+                    filename="test.py",
+                    diff="@@ -1,3 +1,4 @@\n Line 1\n+Line 2\n Line 3\n Line 4",
+                    hunks=[
+                        code.model.HunkModel(
+                            start_line=1,
+                            end_line=4,
+                            changed_lines={2},
+                        ),
+                    ],
+                )
+            },
+        )
         self.assertListEqual(context.modified_files, ["test.py"])
         self.assertListEqual(context.added_files, [])
         self.assertListEqual(context.deleted_files, [])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

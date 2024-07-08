@@ -7,8 +7,8 @@ from ..model import Category, GitHubCommentModel, PullRequestContextModel, Sever
 
 
 def parse_overview(
-        response: ai.schema.ReviewRequestsResponseModel,
-        context: PullRequestContextModel,
+    response: ai.schema.ReviewRequestsResponseModel,
+    context: PullRequestContextModel,
 ) -> model.OverviewModel:
     return model.OverviewModel(
         initial_assessment=model.InitialAssessmentModel(
@@ -36,7 +36,7 @@ def parse_overview(
 
 
 def prioritize_comments(
-        comments: dict[Category, list[GitHubCommentModel]],
+    comments: dict[Category, list[GitHubCommentModel]],
 ) -> tuple[list[GitHubCommentModel], list[GitHubCommentModel]]:
     prioritized_comments = []
     remaining_comments = []
@@ -66,9 +66,9 @@ def prioritize_comments(
 
 
 def extract_comments(
-        response: ai.schema.FileReviewResponseModel,
-        file_context: model.FileContextModel,
-        severity_limit: int,
+    response: ai.schema.FileReviewResponseModel,
+    file_context: model.FileContextModel,
+    severity_limit: int,
 ) -> tuple[list[GitHubCommentModel], list[GitHubCommentModel]]:
     filtered_comments = {}
     for comment in response.feedback:
@@ -109,8 +109,8 @@ def extract_comments(
 
 
 def parse_feedback(
-        response: ai.schema.ReviewResponseModel,
-        comments: list[GitHubCommentModel],
+    response: ai.schema.ReviewResponseModel,
+    comments: list[GitHubCommentModel],
 ) -> model.Feedback:
     return model.Feedback(
         comments=comments,

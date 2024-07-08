@@ -1,5 +1,5 @@
 @@ -6,15 +6,18 @@
- 
+
  import ai.assistant
  import ai.prompt
 +import code.pull_request
@@ -8,8 +8,8 @@
  import logger
 +import review
 +from app import App
- 
- 
+
+
  def main():
      try:
          cfg = config.from_env()
@@ -21,7 +21,7 @@
          sys.exit(69)
 @@ -23,7 +26,8 @@ def main():
          sys.exit(42)
- 
+
      try:
 -        context = build_context(pr)
 +        context = review.build_context(pr)

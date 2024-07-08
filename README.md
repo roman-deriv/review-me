@@ -75,7 +75,7 @@ The system employs a three-step approach leveraging the Anthropic API:
 ### Long-term
 
 - Offer AI-generated code suggestions to address identified issues
-- Develop capabilities to suggest refactoring strategies for complex code 
+- Develop capabilities to suggest refactoring strategies for complex code
 - Implement automated documentation updates based on code modifications
 - Explore capabilities for generating unit tests based on code changes
 - Develop a dashboard for tracking review statistics and trends

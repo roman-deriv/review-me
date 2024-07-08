@@ -26,28 +26,23 @@ def build_pr_context(pull_request: PullRequest) -> model.PullRequestContextModel
         title=pull_request.title,
         description=pull_request.body,
         commit_messages=[
-            commit.commit.message
-            for commit in pull_request.get_commits()
+            commit.commit.message for commit in pull_request.get_commits()
         ],
         review_comments=[
-            comment.body
-            for comment in pull_request.get_review_comments()
+            comment.body for comment in pull_request.get_review_comments()
         ],
-        issue_comments=[
-            comment.body
-            for comment in pull_request.get_issue_comments()
-        ],
+        issue_comments=[comment.body for comment in pull_request.get_issue_comments()],
         patches={
             file.filename: model.FilePatchModel(
                 filename=file.filename,
                 diff=file.patch or "",
-                hunks=[] if not file.patch else parse_diff(file.patch)
+                hunks=[] if not file.patch else parse_diff(file.patch),
             )
             for file in files
         },
-        added_files=[file.filename for file in files if file.status == 'added'],
-        modified_files=[file.filename for file in files if file.status == 'modified'],
-        deleted_files=[file.filename for file in files if file.status == 'removed']
+        added_files=[file.filename for file in files if file.status == "added"],
+        modified_files=[file.filename for file in files if file.status == "modified"],
+        deleted_files=[file.filename for file in files if file.status == "removed"],
     )
     return context
 
@@ -62,14 +57,11 @@ def post_comment(pull_request: PullRequest, message: str):
 
 
 def submit_review(
-        pull_request: PullRequest,
-        body: str,
-        comments: list[model.GitHubCommentModel] = None
+    pull_request: PullRequest,
+    body: str,
+    comments: list[model.GitHubCommentModel] = None,
 ):
-    comments = [
-        comment.model_dump(exclude_none=True)
-        for comment in comments or []
-    ]
+    comments = [comment.model_dump(exclude_none=True) for comment in comments or []]
     logger.log.debug(f"Submitting review: {comments}")
     pull_request.create_review(
         body=body,

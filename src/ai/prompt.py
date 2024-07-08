@@ -21,25 +21,22 @@ class Builder:
             ),
             "persona": jinja2.Environment(
                 loader=jinja2.FileSystemLoader(PROMPT_DIR / "persona"),
-            )
+            ),
         }
 
     def _load_template(
-            self,
-            name: str,
-            prefix: typing.Literal["system", "user", "persona"],
+        self,
+        name: str,
+        prefix: typing.Literal["system", "user", "persona"],
     ) -> jinja2.Template:
         return self._templates[prefix].get_template(name)
 
     def render_template(
-            self, name: str,
-            prefix: typing.Literal["system", "user", "persona"],
-            **kwargs,
+        self,
+        name: str,
+        prefix: typing.Literal["system", "user", "persona"],
+        **kwargs,
     ) -> str:
         template = self._load_template(f"{name}.md", prefix=prefix)
-        overview = template.render(
-            context=self._context,
-            prefix=prefix,
-            **kwargs
-        )
+        overview = template.render(context=self._context, prefix=prefix, **kwargs)
         return overview

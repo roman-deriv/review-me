@@ -9,7 +9,7 @@ def parse_diff(patch: str) -> list[model.HunkModel]:
     current_hunk = None
     current_line = 0
 
-    for line in patch.split('\n'):
+    for line in patch.split("\n"):
         if line.startswith("@@"):
             # Start of a new hunk
             match = re.search(r"@@ -\d+,\d+ \+(\d+),(\d+) @@", line)
@@ -42,13 +42,13 @@ def parse_diff(patch: str) -> list[model.HunkModel]:
 
 
 def closest_hunk(
-        hunks: list[model.HunkModel],
-        comment: model.GitHubCommentModel,
+    hunks: list[model.HunkModel],
+    comment: model.GitHubCommentModel,
 ) -> model.HunkModel | None:
     best_hunk = None
     best_overlap = 0
     nearest_hunk = None
-    min_distance = float('inf')
+    min_distance = float("inf")
 
     for hunk in hunks:
         if not hunk.changed_lines:
@@ -72,8 +72,8 @@ def closest_hunk(
 
 
 def adjust_comment_bounds_to_hunk(
-        hunk: model.HunkModel,
-        comment: model.GitHubCommentModel,
+    hunk: model.HunkModel,
+    comment: model.GitHubCommentModel,
 ) -> model.GitHubCommentModel | None:
     comment_start = comment.start_line
     comment_end = comment.line

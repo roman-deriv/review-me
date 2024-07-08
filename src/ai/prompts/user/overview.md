@@ -13,14 +13,14 @@ Files Deleted:
 {%- for file in context.deleted_files %}
 - {{ file }}
 {%- endfor %}
-{%- endif -%} 
+{%- endif -%}
 
 {% if context.modified_files %}
 Files Modified:
 {%- for file in context.modified_files %}
 - {{ file }}
 {%- endfor %}
-{% endif %} 
+{% endif %}
 
 Changes:
 {%- for filename, patch in context.patches.items() -%}

@@ -2,9 +2,9 @@ import anthropic
 
 
 async def chat_completion(
-        system_prompt: str,
-        prompt: str,
-        model: str,
+    system_prompt: str,
+    prompt: str,
+    model: str,
 ):
     client = anthropic.AsyncClient()
 
@@ -21,7 +21,7 @@ async def chat_completion(
                         "type": "text",
                         "text": prompt,
                     }
-                ]
+                ],
             }
         ],
     )
@@ -29,11 +29,11 @@ async def chat_completion(
 
 
 async def tool_completion(
-        system_prompt: str,
-        prompt: str,
-        model: str,
-        tools: list[dict],
-        tool_override: str = "",
+    system_prompt: str,
+    prompt: str,
+    model: str,
+    tools: list[dict],
+    tool_override: str = "",
 ):
     client = anthropic.AsyncClient()
 
@@ -57,7 +57,7 @@ async def tool_completion(
                         "type": "text",
                         "text": prompt,
                     }
-                ]
+                ],
             }
         ],
         tools=tools,

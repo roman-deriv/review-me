@@ -1,11 +1,11 @@
 # Prompt Strategy for Review Me
 
 This document outlines the prompt engineering strategy
-used to guide AI responses in the Review Me code review assistant. 
+used to guide AI responses in the Review Me code review assistant.
 The strategy employs a combination of system prompts, user prompts,
 and custom tools to generate comprehensive and actionable code reviews.
 
-By following this prompt strategy, Review Me aims to provide consistent, 
+By following this prompt strategy, Review Me aims to provide consistent,
 high-quality code reviews that enhance the overall development process.
 
 ## Overview
@@ -33,21 +33,21 @@ They are static and do not change between reviews.
 User prompts provide specific information about the current PR and guide the AI's response.
 All user prompts extend a base template that includes PR context.
 
-1. **Base Template**: 
+1. **Base Template**:
    - Includes: PR title, description, commit messages, and existing comments
    - Extended by all other user prompts
 
-2. **Overview Template**: 
+2. **Overview Template**:
    - Purpose: Initial assessment of the entire PR
    - Additional variables: None
 
-3. **File Review Template**: 
+3. **File Review Template**:
    - Purpose: Detailed review of a single file
    - Additional variables:
      - Observations from the overview step
      - File context (detailed diff information)
 
-4. **Final Feedback Template**: 
+4. **Final Feedback Template**:
    - Purpose: Synthesize feedback and determine final evaluation
    - Additional variables:
      - Complete list of comments generated from all file reviews

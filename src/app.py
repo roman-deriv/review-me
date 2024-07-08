@@ -11,11 +11,11 @@ from github.PullRequest import PullRequest
 
 class App:
     def __init__(
-            self,
-            pull_request: PullRequest,
-            context: code.model.PullRequestContextModel,
-            assistant: ai.assistant.Assistant,
-            debug: bool = False,
+        self,
+        pull_request: PullRequest,
+        context: code.model.PullRequestContextModel,
+        assistant: ai.assistant.Assistant,
+        debug: bool = False,
     ):
         self._pr = pull_request
         self._context = context
@@ -23,10 +23,10 @@ class App:
         self._debug = debug
 
     async def _review_file(
-            self,
-            observations: list[code.review.model.ObservationModel],
-            context: code.review.model.FileContextModel,
-            delay: float,
+        self,
+        observations: list[code.review.model.ObservationModel],
+        context: code.review.model.FileContextModel,
+        delay: float,
     ) -> tuple[
         list[code.model.GitHubCommentModel],
         list[code.model.GitHubCommentModel],
@@ -46,23 +46,23 @@ class App:
         return prioritized_comments, remaining_comments
 
     async def _review_files(
-            self,
-            observations: list[code.review.model.ObservationModel],
-            contexts: list[code.review.model.FileContextModel],
+        self,
+        observations: list[code.review.model.ObservationModel],
+        contexts: list[code.review.model.FileContextModel],
     ) -> tuple[
         list[code.model.GitHubCommentModel],
         list[code.model.GitHubCommentModel],
     ]:
         prioritized_comments, remaining_comments = [], []
 
-        for prioritized, remaining in await asyncio.gather(*[
-            asyncio.create_task(self._review_file(
-                observations,
-                context,
-                delay=i * 5),
-            )
-            for i, context in enumerate(contexts)
-        ]):
+        for prioritized, remaining in await asyncio.gather(
+            *[
+                asyncio.create_task(
+                    self._review_file(observations, context, delay=i * 5),
+                )
+                for i, context in enumerate(contexts)
+            ]
+        ):
             for comment in prioritized:
                 prioritized_comments.append(comment)
             for comment in remaining:
@@ -105,7 +105,7 @@ class App:
         code.pull_request.submit_review(
             pull_request=self._pr,
             body=f"{feedback.overall_comment}\n\n"
-                 f"{feedback.justification}\n"
-                 f"Final Evaluation: {feedback.evaluation}",
+            f"{feedback.justification}\n"
+            f"Final Evaluation: {feedback.evaluation}",
             comments=prioritized_comments,
         )
