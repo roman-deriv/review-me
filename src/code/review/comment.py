@@ -70,7 +70,7 @@ def extract_comments(
     file_context: model.FileContextModel,
     severity_limit: int,
 ) -> tuple[list[GitHubCommentModel], list[GitHubCommentModel]]:
-    filtered_comments = {}
+    filtered_comments: dict[Category, list[GitHubCommentModel]] = {}
     for comment in response.feedback:
         severity = Severity.from_string(comment.severity)
         if severity > severity_limit:
