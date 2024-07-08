@@ -16,11 +16,6 @@ def main():
     logger.log.debug(f"Pull request retrieved: #{pr.number}")
 
     try:
-        code.pull_request.post_comment(
-            pr,
-            f'Your review of "{pr.title}" has started.\n'
-            f"Your review will be posted shortly.",
-        )
         context = code.pull_request.build_pr_context(pr)
         logger.log.debug(f"Context built successfully: {context.title}")
         builder = ai.prompt.Builder(context)
