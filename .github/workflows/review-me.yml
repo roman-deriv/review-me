@@ -22,16 +22,11 @@ jobs:
           fetch-depth: 0
 
       - name: Post "Review in Progress" Comment
-        uses: actions/github-script@v6
+        uses: peter-evans/create-or-update-comment@v1
         with:
-          github-token: ${{github.token}}
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.name,
-              body: 'Review in progress, it will be posted as soon as it is complete.  This comment is from the Github action'
-            })
+          token: ${{ github.token }}
+          issue-number: ${{ github.event.issue.number }}
+          body: 'Review in progress, it will be posted as soon as it is complete. This comment is from the GitHub action.'
 
       - name: LLM Code Review
         uses: ./
