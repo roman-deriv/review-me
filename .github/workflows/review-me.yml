@@ -24,7 +24,7 @@ jobs:
       - name: Post "Review in Progress" Comment
         uses: actions/github-script@v6
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
+          github-token: ${{github.token}}
           script: |
             github.rest.issues.createComment({
               issue_number: context.issue.number,
