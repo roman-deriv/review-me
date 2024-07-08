@@ -24,13 +24,13 @@ class Builder:
     def _load_template(
             self,
             name: str,
-            prefix: typing.Literal["system", "user"],
+            prefix: typing.Literal["system", "user", "persona"],
     ) -> jinja2.Template:
         return self._templates[prefix].get_template(name)
 
     def render_template(
             self, name: str,
-            prefix: typing.Literal["system", "user"],
+            prefix: typing.Literal["system", "user", "persona"],
             **kwargs,
     ) -> str:
         template = self._load_template(f"{name}.md", prefix=prefix)

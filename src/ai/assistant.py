@@ -11,6 +11,10 @@ class Assistant:
     def __init__(self, model_name: str, builder: prompt.Builder):
         self._model_name = model_name
         self._builder = builder
+        self._persona = self._builder.render_template(
+            name="pirate",
+            prefix="persona",
+        )
 
     async def overview(
             self,
@@ -20,6 +24,7 @@ class Assistant:
             system_prompt=self._builder.render_template(
                 name="overview",
                 prefix="system",
+                persona=self._persona,
             ),
             prompt=self._builder.render_template(
                 name="overview",
@@ -52,6 +57,7 @@ class Assistant:
             system_prompt=self._builder.render_template(
                 name="file-review",
                 prefix="system",
+                persona=self._persona,
             ),
             prompt=self._builder.render_template(
                 name="file-review",
@@ -80,6 +86,7 @@ class Assistant:
             system_prompt=self._builder.render_template(
                 name="review-summary",
                 prefix="system",
+                persona=self._persona,
             ),
             prompt=self._builder.render_template(
                 name="review-summary",
