@@ -28,7 +28,7 @@ def parse_overview(
                 changes=request.changes,
                 related_changes=request.related_changes,
                 reason=request.reason,
-                patch=context.patches[request.filename],
+                patch=context.patches.get(request.filename, 'File Name Not Found'),
             )
             for request in response.files_for_review or []
         ],
