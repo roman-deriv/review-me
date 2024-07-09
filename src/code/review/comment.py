@@ -10,6 +10,20 @@ def parse_overview(
     response: ai.schema.ReviewRequestsResponseModel,
     context: PullRequestContextModel,
 ) -> model.OverviewModel:
+    contexts = []
+    for request in response.files_for_review or []:
+        patch = context.patches.get(request.filename)
+        if not patch:
+            logger.log.warning(f"No diff present for `{request.filename}`")
+            continue
+        file_context = model.FileContextModel(
+            path=request.filename,
+            changes=request.changes,
+            related_changes=request.related_changes,
+            reason=request.reason,
+            patch=patch,
+        )
+        contexts.append(file_context)
     return model.OverviewModel(
         initial_assessment=model.InitialAssessmentModel(
             status=model.Status[response.initial_assessment.status],
@@ -22,16 +36,7 @@ def parse_overview(
             )
             for observation in response.observations or []
         ],
-        file_contexts=[
-            model.FileContextModel(
-                path=request.filename,
-                changes=request.changes,
-                related_changes=request.related_changes,
-                reason=request.reason,
-                patch=context.patches[request.filename],
-            )
-            for request in response.files_for_review or []
-        ],
+        file_contexts=contexts,
     )
 
 
