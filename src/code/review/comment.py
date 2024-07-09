@@ -12,18 +12,18 @@ def parse_overview(
 ) -> model.OverviewModel:
     contexts = []
     for request in response.files_for_review or []:
-        try:
-            file_context = model.FileContextModel(
-                path=request.filename,
-                changes=request.changes,
-                related_changes=request.related_changes,
-                reason=request.reason,
-                patch=context.patches[request.filename],
-            )
-            contexts.append(file_context)
-        except TypeError as e:
-            logger.log.error(f"TypeError encountered while building contexts for {request} while parsing overview: {e}")
+        patch = context.patches.get(request.filename)
+        if not patch:
+            logger.log.warning(f"No diff present for `{request.filename}`")
             continue
+        file_context = model.FileContextModel(
+            path=request.filename,
+            changes=request.changes,
+            related_changes=request.related_changes,
+            reason=request.reason,
+            patch=patch,
+        )
+        contexts.append(file_context)
     return model.OverviewModel(
         initial_assessment=model.InitialAssessmentModel(
             status=model.Status[response.initial_assessment.status],
