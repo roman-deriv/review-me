@@ -1,5 +1,8 @@
 name: Review Me (Iterative AI Code Review)
 description: A GitHub Action to automate code review using LLMs.
+branding:
+  icon: 'check-circle'
+  color: 'purple'
 inputs:
   github_token:
     description: 'GitHub Token'
