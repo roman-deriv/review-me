@@ -37,7 +37,7 @@ def from_env() -> AppConfig:
 
         strategy = os.environ.get("LLM_STRATEGY", "anthropic")
         model = os.environ.get("MODEL", "claude-3-5-sonnet-20240620")
-        persona = os.environ.get("PERSONA", "pirate")
+        persona = os.environ.get("PERSONA", "default")
 
         with open(event_path, "r") as f:
             event = json.load(f)
