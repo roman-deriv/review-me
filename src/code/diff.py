@@ -8,6 +8,7 @@ def parse_diff(patch: str) -> list[model.HunkModel]:
     hunks = []
     current_hunk = None
     current_line = 0
+    hunk_content = []
 
     for line in patch.split("\n"):
         if line.startswith("@@"):
@@ -15,6 +16,7 @@ def parse_diff(patch: str) -> list[model.HunkModel]:
             match = re.search(r"@@ -\d+,\d+ \+(\d+),(\d+) @@", line)
             if match:
                 if current_hunk:
+                    current_hunk.diff_content = "\n".join(hunk_content)
                     hunks.append(current_hunk)
                 start_line = int(match.group(1))
                 line_count = int(match.group(2))
@@ -23,9 +25,12 @@ def parse_diff(patch: str) -> list[model.HunkModel]:
                     start_line=start_line,
                     end_line=end_line,
                     changed_lines=set(),
+                    diff_content=""
                 )
                 current_line = start_line
+                hunk_content = [line]
         elif current_hunk:
+            hunk_content.append(line)
             if line.startswith("+"):
                 # This is an added or modified line
                 current_hunk.changed_lines.add(current_line)
@@ -36,6 +41,7 @@ def parse_diff(patch: str) -> list[model.HunkModel]:
 
     # Add the last hunk
     if current_hunk:
+        current_hunk.diff_content = "\n".join(hunk_content)
         hunks.append(current_hunk)
 
     return hunks
