@@ -20,7 +20,7 @@ def get_pr(cfg: config.GitHubConfig):
         sys.exit(69)
 
 
-def build_pr_context(pull_request: PullRequest) -> model.PullRequestContextModel:
+async def build_pr_context(pull_request: PullRequest) -> model.PullRequestContextModel:
     files = pull_request.get_files()
     context = model.PullRequestContextModel(
         title=pull_request.title,

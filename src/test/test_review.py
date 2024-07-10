@@ -9,7 +9,6 @@ from github.PullRequestComment import PullRequestComment
 
 import code.model
 import code.pull_request
-import code.review.context
 import code.review.model
 
 
@@ -19,7 +18,7 @@ class TestReview(unittest.TestCase):
         self.mock_pr.title = "Test PR"
         self.mock_pr.body = "This is a test pull request"
 
-    def test_build_pr_context(self):
+    async def test_build_pr_context(self):
         mock_file = Mock(spec=File)
         mock_file.filename = "test.py"
         mock_file.patch = "@@ -1,3 +1,4 @@\n Line 1\n+Line 2\n Line 3\n Line 4"
@@ -39,7 +38,7 @@ class TestReview(unittest.TestCase):
         self.mock_pr.get_review_comments.return_value = [mock_review_comment]
         self.mock_pr.get_issue_comments.return_value = [mock_issue_comment]
 
-        context = code.pull_request.build_pr_context(self.mock_pr)
+        context = await code.pull_request.build_pr_context(self.mock_pr)
 
         self.assertEqual(context.title, "Test PR")
         self.assertEqual(context.description, "This is a test pull request")
