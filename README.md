@@ -44,11 +44,13 @@ To use Review Me in your GitHub repository, follow these steps:
 
 ### Prerequisites
 
-- An Anthropic API key (Claude model access required)
+- An [Anthropic](https://www.anthropic.com/) API key (Claude model access required)
+- A [Voyage AI](https://www.voyageai.com) API Key
 
 ### Setup
 
 1. Add an `ANTHROPIC_API_KEY` to your repository secrets.
+1. Add a `VOYAGE_API_KEY` to your repository secrets.
 2. (Optional) Specify a persona as a repository variable named `PERSONA`.
 
 ### Example Action Definition
@@ -84,6 +86,7 @@ jobs:
         with:
           github_token: ${{ github.token }}
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          voyage_api_key: ${{ secrets.VOYAGE_API_KEY }}
 ```
 
 ### Triggering a Review
@@ -107,6 +110,7 @@ These can be set as inputs in your workflow file or as repository variables/secr
 ### Repository Secrets
 
 - `ANTHROPIC_API_KEY`: Your Anthropic API key for accessing the Claude model.
+- `VOYAGE_API_KEY`: Your Anthropic API key for accessing the Claude model.
 
 ## Key Goals
 
