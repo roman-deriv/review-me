@@ -2,43 +2,37 @@
 
 ## Purpose
 
-Review Me is an AI-powered code review assistant deployed as a GitHub action. It aims to streamline the code review
-process by providing an initial layer of automated, high-quality feedback on pull requests before human reviewers
-intervene. This allows human reviewers to focus on more complex aspects of code changes, ultimately improving code
-quality and reducing review time.
+Review Me is an AI-powered code review assistant deployed as a GitHub action. It aims to streamline the development process by providing rapid, actionable feedback on code changes before human review. This tool is designed to catch minor issues and obvious improvements early, allowing developers to iterate quickly and human reviewers to focus on more complex aspects of code changes.
+
+## Philosophy
+
+Review Me is not meant to replace human code reviews. Instead, it serves as a complementary tool in the development process, acting more like a pair-programming assistant than a traditional code review bot. Our goal is to enhance the entire review process, not to automate it entirely.
 
 ## Key Features
 
-- Automated, comprehensive code review for pull requests
+- Instant, comprehensive code review for pull requests
 - Support for multiple programming languages
-- Immediate, actionable feedback to developers
+- Specific, multi-line comments packaged into a complete review
 - Prioritization of substantial, valuable feedback
-- Customizable review criteria and focus areas [Coming soon!]
+- Iterative review support: push code, get feedback, improve, repeat
+- Easy integration with existing GitHub workflows
 
 ## Process
 
-> For a detailed explanation of how Review Me uses prompts and tools to generate reviews,
-> please see our [Prompt Strategy Document](./docs/prompt-strategy.md).
-
 The system employs a three-step approach leveraging the Anthropic API:
 
-### Step 1: Initial Filtering
+1. **Initial Filtering**: Assesses the entire PR diff and identifies files needing detailed review.
+2. **Detailed File Review**: Conducts in-depth reviews of identified files, providing specific comments.
+3. **Overall Summary and Evaluation**: Synthesizes comments into a comprehensive review summary.
 
-- Performs an initial assessment of the entire PR diff
-- Identifies files requiring more careful review based on predefined criteria
-- Utilizes a custom `review_files` tool to submit files for detailed review
+For a detailed explanation of our prompt strategy, see our [Prompt Strategy Document](./docs/prompt-strategy.md).
 
-### Step 2: Detailed File Review
+## What Sets Review Me Apart
 
-- Conducts in-depth reviews of individual files identified in Step 1
-- Provides specific, actionable comments on code changes
-- Employs a custom `post_feedback` tool to aggregate comments for final evaluation
-
-### Step 3: Overall Summary and Evaluation
-
-- Synthesizes individual comments into a comprehensive review summary
-- Determines the final review action (approve, comment, or request changes)
-- Uses a custom `submit_review` tool to submit the final evaluation
+- Focus on augmenting, not replacing, human reviews
+- Support for iterative development and rapid feedback cycles
+- Comprehensive review with specific, multi-line comments
+- Philosophy of improving the entire review process, not just automating parts of it
 
 ## Usage
 
@@ -116,11 +110,11 @@ These can be set as inputs in your workflow file or as repository variables/secr
 
 ## Key Goals
 
-1. Enhance code quality through consistent, thorough reviews
-2. Reduce time spent on trivial fixes during human reviews
-3. Provide immediate, actionable feedback to developers
-4. Support multiple programming languages and coding styles
-5. Prioritize valuable, substantive feedback over minor issues
+1. Accelerate development cycles through instant, actionable feedback
+2. Enhance code quality by catching minor issues early
+3. Streamline human reviews by addressing trivial fixes beforehand
+4. Support iterative development with rapid feedback loops
+5. Maintain the value of human insight in the review process
 
 ## Current Challenges and Ongoing Improvements
 
@@ -134,8 +128,9 @@ These can be set as inputs in your workflow file or as repository variables/secr
 ### Near-term
 
 - Allow users to define custom review rules and priorities
-- Implement a feedback loop to improve review quality based on user interactions
+- Use semantic similarity to group related hunks of code for review, instead of going file by file
 - Enhance the AI's ability to understand relationships between different files in a PR
+- Gather user feedback by capturing replies to review comments and allowing the LLM to respond as needed
 - Provide insights on architectural impacts of changes
 
 ### Long-term
@@ -149,8 +144,7 @@ These can be set as inputs in your workflow file or as repository variables/secr
 
 ## Contributing
 
-We currently have no structured contribution process,
-but we are always open to suggestions in the form of issues or pull requests.
+We welcome contributions and ideas that align with our vision of enhancing the code review process while maintaining the crucial role of human reviewers. Please feel free to open issues or submit pull requests.
 
 ## License
 
