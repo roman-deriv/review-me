@@ -1,4 +1,4 @@
-name: LLM Code Review
+name: Review Me
 description: A GitHub Action to automate code review using LLMs.
 inputs:
   github_token:
