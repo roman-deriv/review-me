@@ -1,10 +1,11 @@
 import re
 
 import logger
+from ai import voyage
 from . import model
 
 
-def parse_diff(patch: str) -> list[model.HunkModel]:
+async def parse_diff(patch: str) -> list[model.HunkModel]:
     hunks = []
     current_hunk = None
     current_line = 0
@@ -44,12 +45,20 @@ def parse_diff(patch: str) -> list[model.HunkModel]:
         current_hunk.diff_content = "\n".join(hunk_content)
         hunks.append(current_hunk)
 
+    # Generate embeddings for all hunks
+    hunk_contents = [hunk.diff_content for hunk in hunks]
+    embeddings = await voyage.get_embeddings(hunk_contents)
+
+    # Assign embeddings to hunks
+    for hunk, embedding in zip(hunks, embeddings):
+        hunk.embedding = embedding
+
     return hunks
 
 
 def closest_hunk(
-    hunks: list[model.HunkModel],
-    bounds: tuple[int, int],
+        hunks: list[model.HunkModel],
+        bounds: tuple[int, int],
 ) -> model.HunkModel | None:
     start_line, end_line = bounds
     best_hunk = None
@@ -79,9 +88,9 @@ def closest_hunk(
 
 
 def adjust_comment_bounds_to_hunk(
-    hunk: model.HunkModel,
-    start_line: int,
-    end_line: int,
+        hunk: model.HunkModel,
+        start_line: int,
+        end_line: int,
 ) -> tuple[int, int]:
     logger.log.debug(f"Comment start line: {start_line}")
     logger.log.debug(f"Comment end line: {end_line}")

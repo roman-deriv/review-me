@@ -40,6 +40,7 @@ class HunkModel(BaseModel):
     end_line: int
     changed_lines: set[int]
     diff_content: str
+    embedding: list[float] | None = None
 
     def contains(self, line: int) -> bool:
         return self.start_line <= line <= self.end_line
