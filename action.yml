@@ -1,4 +1,4 @@
-name: Review Me
+name: Review Me (Iterative AI Code Review)
 description: A GitHub Action to automate code review using LLMs.
 inputs:
   github_token:
