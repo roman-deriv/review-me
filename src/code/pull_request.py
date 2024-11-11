@@ -31,6 +31,14 @@ async def build_pr_context(pull_request: PullRequest) -> model.PullRequestContex
         review_comments=[
             comment.body for comment in pull_request.get_review_comments()
         ],
+        patches={
+            file.filename: model.FilePatchModel(
+                filename=file.filename,
+                diff=file.patch or "",
+                hunks=[] if not file.patch else parse_diff(file.patch),
+            )
+            for file in files
+        },
         added_files=[file.filename for file in files if file.status == "added"],
         modified_files=[file.filename for file in files if file.status == "modified"],
         deleted_files=[file.filename for file in files if file.status == "removed"],
