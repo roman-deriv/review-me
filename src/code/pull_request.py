@@ -22,6 +22,7 @@ def get_pr(cfg: config.GitHubConfig):
 
 async def build_pr_context(pull_request: PullRequest) -> model.PullRequestContextModel:
     files = pull_request.get_files()
+    logger.log.debug(f"Files in PR: {files}")
     context = model.PullRequestContextModel(
         title=pull_request.title,
         description=pull_request.body or "",
