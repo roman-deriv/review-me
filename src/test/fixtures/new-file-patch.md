@@ -17,10 +17,6 @@
 +            comment.body
 +            for comment in pull_request.get_review_comments()
 +        ],
-+        issue_comments=[
-+            comment.body
-+            for comment in pull_request.get_issue_comments()
-+        ],
 +        diffs={
 +            file.filename: file.patch
 +            for file in files

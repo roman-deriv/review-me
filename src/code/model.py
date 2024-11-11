@@ -83,7 +83,6 @@ class PullRequestContextModel(BaseModel):
     title: str
     description: str
     commit_messages: list[str]
-    issue_comments: list[str]
     review_comments: list[str]
     patches: dict[str, FilePatchModel]
     added_files: list[str]

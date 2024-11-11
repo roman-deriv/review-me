@@ -36,7 +36,6 @@ class TestReview(unittest.TestCase):
         self.mock_pr.get_files.return_value = [mock_file]
         self.mock_pr.get_commits.return_value = [mock_commit]
         self.mock_pr.get_review_comments.return_value = [mock_review_comment]
-        self.mock_pr.get_issue_comments.return_value = [mock_issue_comment]
 
         context = await code.pull_request.build_pr_context(self.mock_pr)
 
@@ -44,7 +43,6 @@ class TestReview(unittest.TestCase):
         self.assertEqual(context.description, "This is a test pull request")
         self.assertListEqual(context.commit_messages, ["Test commit"])
         self.assertListEqual(context.review_comments, ["Test review comment"])
-        self.assertListEqual(context.issue_comments, ["Test issue comment"])
         self.assertEqual(
             context.patches,
             {
